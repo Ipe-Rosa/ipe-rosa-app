@@ -1,0 +1,43 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+  background-color: #fff5f7;
+  color: #4a2b34;
+}
+
+header {
+  background-color: #e8a0bf;
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+}
+
+main {
+  max-width: 700px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero h2 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+  color: #d46a8f;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 0.9rem;
+}
