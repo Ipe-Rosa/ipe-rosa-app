@@ -108,6 +108,20 @@ footer {
 
 .btn-primary:hover { background-color: #c05a7d; }
 
+.auth-form select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+}
+
+.preview-foto {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
 .mensagem { margin-top: 12px; font-size: 0.9rem; min-height: 20px; }
 .mensagem.erro { color: #c0392b; }
 .mensagem.sucesso { color: #27ae60; }
