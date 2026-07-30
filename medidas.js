@@ -82,8 +82,12 @@ document.getElementById("form-medidas").addEventListener("submit", async (e) => 
     return;
   }
 
-  mensagem.textContent = "Medidas salvas! Em breve seu molde estará disponível aqui.";
+mensagem.textContent = "Medidas salvas! Gerando seu molde...";
   mensagem.className = "mensagem sucesso";
+
+  setTimeout(() => {
+    window.location.href = "molde.html";
+  }, 1500);
 });
 
 carregarPedidoPendente();
