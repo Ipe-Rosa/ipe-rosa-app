@@ -41,3 +41,73 @@ footer {
   color: #999;
   font-size: 0.9rem;
 }
+
+.auth-box {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: #f5e6ec;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #999;
+}
+
+.tab-btn.active {
+  background: #e8a0bf;
+  color: white;
+  font-weight: bold;
+}
+
+.tab-btn:first-child { border-radius: 8px 0 0 8px; }
+.tab-btn:last-child { border-radius: 0 8px 8px 0; }
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.auth-form label {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  color: #4a2b34;
+}
+
+.auth-form input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #d46a8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover { background-color: #c05a7d; }
+
+.mensagem { margin-top: 12px; font-size: 0.9rem; min-height: 20px; }
+.mensagem.erro { color: #c0392b; }
+.mensagem.sucesso { color: #27ae60; }
