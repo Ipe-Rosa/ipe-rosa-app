@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enviar Foto - IPÊ ROSA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>IPÊ ROSA</h1>
+    <p>Envie a foto da roupa</p>
+  </header>
+
+  <main>
+    <section class="auth-box">
+      <form id="form-upload" class="auth-form">
+        <label for="foto">Foto da roupa</label>
+        <input type="file" id="foto" accept="image/*" required>
+        <img id="preview" class="preview-foto" style="display:none;">
+
+        <label for="tipo-peca">Tipo de peça</label>
+        <select id="tipo-peca" required>
+          <option value="">Selecione...</option>
+          <option value="camiseta_basica">Camiseta básica</option>
+          <option value="saia_reta">Saia reta</option>
+          <option value="calca_reta">Calça reta</option>
+        </select>
+
+        <button type="submit" class="btn-primary">Enviar</button>
+        <p id="upload-mensagem" class="mensagem"></p>
+      </form>
+      <p style="text-align:center; margin-top:16px;"><a href="painel.html">&larr; Voltar ao painel</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="upload.js"></script>
+</body>
+</html>
