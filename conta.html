@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar ou Criar Conta - IPÊ ROSA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>IPÊ ROSA</h1>
+    <p>Transforme uma foto em molde de costura</p>
+  </header>
+
+  <main>
+    <section class="auth-box">
+      <div class="auth-tabs">
+        <button id="tab-entrar" class="tab-btn active">Entrar</button>
+        <button id="tab-cadastrar" class="tab-btn">Criar conta</button>
+      </div>
+
+      <form id="form-entrar" class="auth-form">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" required placeholder="seuemail@exemplo.com">
+
+        <label for="login-senha">Senha</label>
+        <input type="password" id="login-senha" required placeholder="Sua senha">
+
+        <button type="submit" class="btn-primary">Entrar</button>
+        <p id="login-mensagem" class="mensagem"></p>
+      </form>
+
+      <form id="form-cadastrar" class="auth-form" style="display:none;">
+        <label for="cad-email">E-mail</label>
+        <input type="email" id="cad-email" required placeholder="seuemail@exemplo.com">
+
+        <label for="cad-senha">Senha (mínimo 6 caracteres)</label>
+        <input type="password" id="cad-senha" required minlength="6" placeholder="Crie uma senha">
+
+        <button type="submit" class="btn-primary">Criar conta</button>
+        <p id="cad-mensagem" class="mensagem"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
