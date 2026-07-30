@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seu Molde - IPÊ ROSA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>IPÊ ROSA</h1>
+    <p>Seu molde ajustado</p>
+  </header>
+
+  <main>
+    <section class="auth-box" style="max-width:500px;">
+      <div id="carregando">Carregando seu molde...</div>
+
+      <div id="sem-molde" style="display:none;">
+        <p>Nenhum pedido com medidas prontas foi encontrado.</p>
+        <p style="text-align:center; margin-top:12px;"><a href="upload.html">Enviar uma foto primeiro &rarr;</a></p>
+      </div>
+
+      <div id="resultado-molde" style="display:none;">
+        <p id="molde-titulo" style="font-weight:bold; margin-bottom:8px;"></p>
+        <div id="molde-svg-container" style="text-align:center;"></div>
+        <p style="font-size:0.85rem; color:#999; margin-top:12px;">
+          ⚠️ Versão simplificada para validação do sistema. Ainda não substitui um molde profissional — sempre faça um teste em tecido barato (toile) antes de cortar o tecido final.
+        </p>
+      </div>
+
+      <p style="text-align:center; margin-top:16px;"><a href="painel.html">&larr; Voltar ao painel</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="molde.js"></script>
+</body>
+</html>
