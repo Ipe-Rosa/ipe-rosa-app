@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suas Medidas - IPÊ ROSA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>IPÊ ROSA</h1>
+    <p>Informe suas medidas</p>
+  </header>
+
+  <main>
+    <section class="auth-box">
+      <div id="carregando">Carregando seu pedido...</div>
+
+      <div id="sem-pedido" style="display:none;">
+        <p>Você não tem nenhum pedido aguardando medidas.</p>
+        <p style="text-align:center; margin-top:12px;"><a href="upload.html">Enviar uma foto primeiro &rarr;</a></p>
+      </div>
+
+      <form id="form-medidas" class="auth-form" style="display:none;">
+        <p id="tipo-peca-titulo" style="font-weight:bold; margin-bottom:8px;"></p>
+
+        <!-- Campos: Camiseta básica -->
+        <div class="grupo-medida" data-tipo="camiseta_basica" style="display:none;">
+          <label for="busto">Busto (cm)</label>
+          <input type="number" id="busto" step="0.5">
+          <label for="comprimento_camiseta">Comprimento (cm)</label>
+          <input type="number" id="comprimento_camiseta" step="0.5">
+          <label for="manga">Manga (cm)</label>
+          <input type="number" id="manga" step="0.5">
+        </div>
+
+        <!-- Campos: Saia reta -->
+        <div class="grupo-medida" data-tipo="saia_reta" style="display:none;">
+          <label for="cintura_saia">Cintura (cm)</label>
+          <input type="number" id="cintura_saia" step="0.5">
+          <label for="quadril_saia">Quadril (cm)</label>
+          <input type="number" id="quadril_saia" step="0.5">
+          <label for="comprimento_saia">Comprimento (cm)</label>
+          <input type="number" id="comprimento_saia" step="0.5">
+        </div>
+
+        <!-- Campos: Calça reta -->
+        <div class="grupo-medida" data-tipo="calca_reta" style="display:none;">
+          <label for="cintura_calca">Cintura (cm)</label>
+          <input type="number" id="cintura_calca" step="0.5">
+          <label for="quadril_calca">Quadril (cm)</label>
+          <input type="number" id="quadril_calca" step="0.5">
+          <label for="entrepernas">Entrepernas (cm)</label>
+          <input type="number" id="entrepernas" step="0.5">
+          <label for="comprimento_calca">Comprimento (cm)</label>
+          <input type="number" id="comprimento_calca" step="0.5">
+        </div>
+
+        <button type="submit" class="btn-primary">Salvar medidas</button>
+        <p id="medidas-mensagem" class="mensagem"></p>
+      </form>
+
+      <p style="text-align:center; margin-top:16px;"><a href="painel.html">&larr; Voltar ao painel</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="medidas.js"></script>
+</body>
+</html>
