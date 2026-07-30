@@ -1,0 +1,89 @@
+const SUPABASE_URL = "https://ksognpzaasjevupohfdv.supabase.co";
+const SUPABASE_KEY = "COLE_AQUI_SUA_PUBLISHABLE_KEY";
+
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const nomesTipoPeca = {
+  camiseta_basica: "Camiseta básica",
+  saia_reta: "Saia reta",
+  calca_reta: "Calça reta"
+};
+
+let pedidoAtual = null;
+
+async function carregarPedidoPendente() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.href = "conta.html";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("pedidos_de_molde")
+    .select("*")
+    .eq("usuario_id", session.user.id)
+    .eq("status", "aguardando_medidas")
+    .order("data_criacao", { ascending: false })
+    .limit(1);
+
+  document.getElementById("carregando").style.display = "none";
+
+  if (error || !data || data.length === 0) {
+    document.getElementById("sem-pedido").style.display = "block";
+    return;
+  }
+
+  pedidoAtual = data[0];
+  mostrarCamposDoTipo(pedidoAtual.tipo_peca);
+}
+
+function mostrarCamposDoTipo(tipoPeca) {
+  document.getElementById("tipo-peca-titulo").textContent =
+    "Peça: " + (nomesTipoPeca[tipoPeca] || tipoPeca);
+
+  document.querySelectorAll(".grupo-medida").forEach((grupo) => {
+    grupo.style.display = grupo.dataset.tipo === tipoPeca ? "block" : "none";
+  });
+
+  document.getElementById("form-medidas").style.display = "block";
+}
+
+document.getElementById("form-medidas").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const mensagem = document.getElementById("medidas-mensagem");
+
+  const grupoVisivel = document.querySelector(
+    `.grupo-medida[data-tipo="${pedidoAtual.tipo_peca}"]`
+  );
+  const campos = grupoVisivel.querySelectorAll("input");
+
+  const medidas = {};
+  for (const campo of campos) {
+    if (!campo.value) {
+      mensagem.textContent = "Preencha todas as medidas antes de salvar.";
+      mensagem.className = "mensagem erro";
+      return;
+    }
+    medidas[campo.id] = parseFloat(campo.value);
+  }
+
+  mensagem.textContent = "Salvando...";
+  mensagem.className = "mensagem";
+
+  const { error } = await supabaseClient
+    .from("pedidos_de_molde")
+    .update({ medidas: medidas, status: "medidas_informadas" })
+    .eq("id", pedidoAtual.id);
+
+  if (error) {
+    mensagem.textContent = "Erro ao salvar: " + error.message;
+    mensagem.className = "mensagem erro";
+    return;
+  }
+
+  mensagem.textContent = "Medidas salvas! Em breve seu molde estará disponível aqui.";
+  mensagem.className = "mensagem sucesso";
+});
+
+carregarPedidoPendente();
