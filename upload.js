@@ -74,8 +74,12 @@ document.getElementById("form-upload").addEventListener("submit", async (e) => {
     return;
   }
 
-  mensagem.textContent = "Foto enviada com sucesso! Em breve você poderá informar suas medidas.";
+  mensagem.textContent = "Foto enviada com sucesso! Redirecionando para informar suas medidas...";
   mensagem.className = "mensagem sucesso";
+
+  setTimeout(() => {
+    window.location.href = "medidas.html";
+  }, 1500);
 });
 
 verificarLogin();
