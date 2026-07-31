@@ -10,6 +10,12 @@ const nomesTipoPeca = {
   calca_reta: "Calça reta"
 };
 
+// Guardamos os dados do molde carregado para o botão de PDF usar depois
+let pedidoGlobal = null;
+let moldeBaseGlobal = null;
+let escalaXGlobal = 1;
+let escalaYGlobal = 1;
+
 async function carregarMolde() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) {
@@ -52,10 +58,14 @@ async function carregarMolde() {
   const escalaX = medidasUsuario[moldeBase.eixo_x] / medidasPadrao[moldeBase.eixo_x];
   const escalaY = medidasUsuario[moldeBase.eixo_y] / medidasPadrao[moldeBase.eixo_y];
 
+  pedidoGlobal = pedido;
+  moldeBaseGlobal = moldeBase;
+  escalaXGlobal = escalaX;
+  escalaYGlobal = escalaY;
+
   document.getElementById("molde-titulo").textContent =
     "Peça: " + (nomesTipoPeca[pedido.tipo_peca] || pedido.tipo_peca);
 
-// Faz o "quadro" do desenho crescer junto com a escala, para nada ficar cortado
   const [vbX, vbY, vbLargura, vbAltura] = moldeBase.viewbox.split(" ").map(Number);
   const novoViewBox = `${vbX} ${vbY} ${vbLargura * escalaX} ${vbAltura * escalaY}`;
 
@@ -74,5 +84,62 @@ async function carregarMolde() {
     .update({ status: "molde_gerado" })
     .eq("id", pedido.id);
 }
+
+// ===== GERAÇÃO DO PDF EM TAMANHO REAL =====
+async function gerarPDF() {
+  const mensagem = document.getElementById("pdf-mensagem");
+  mensagem.textContent = "Gerando PDF...";
+  mensagem.className = "mensagem";
+
+  try {
+    const { jsPDF } = window.jspdf;
+
+    const nomePeca = nomesTipoPeca[pedidoGlobal.tipo_peca] || pedidoGlobal.tipo_peca;
+    const larguraCm = pedidoGlobal.medidas[moldeBaseGlobal.eixo_x];
+    const alturaCm = pedidoGlobal.medidas[moldeBaseGlobal.eixo_y];
+    const margemCm = 2;
+    const espacoTitulo = 2;
+    const espacoRodape = 2.5;
+
+    const larguraPagina = larguraCm + margemCm * 2;
+    const alturaPagina = alturaCm + margemCm * 2 + espacoTitulo + espacoRodape;
+
+    const doc = new jsPDF({
+      unit: "cm",
+      format: [larguraPagina, alturaPagina]
+    });
+
+    doc.setFontSize(14);
+    doc.text("IPÊ ROSA - " + nomePeca, margemCm, margemCm);
+    doc.setFontSize(9);
+    doc.text("Medidas: " + JSON.stringify(pedidoGlobal.medidas), margemCm, margemCm + 0.6);
+
+    const svgElement = document.querySelector("#molde-svg-container svg");
+    await doc.svg(svgElement, {
+      x: margemCm,
+      y: margemCm + espacoTitulo,
+      width: larguraCm,
+      height: alturaCm
+    });
+
+    doc.setFontSize(9);
+    const textoAviso = doc.splitTextToSize(
+      "Versão simplificada para validação do sistema. Ainda não substitui um molde profissional — sempre faça um teste em tecido barato (toile) antes de cortar o tecido final. Imprima sem ajuste de escala (100%).",
+      larguraCm
+    );
+    doc.text(textoAviso, margemCm, margemCm + espacoTitulo + alturaCm + 0.8);
+
+    doc.save(`molde-${pedidoGlobal.tipo_peca}.pdf`);
+
+    mensagem.textContent = "PDF gerado! Confira sua pasta de downloads.";
+    mensagem.className = "mensagem sucesso";
+  } catch (erro) {
+    mensagem.textContent = "Erro ao gerar PDF: " + erro.message;
+    mensagem.className = "mensagem erro";
+    console.error(erro);
+  }
+}
+
+document.getElementById("btn-baixar-pdf").addEventListener("click", gerarPDF);
 
 carregarMolde();
