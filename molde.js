@@ -97,39 +97,60 @@ async function gerarPDF() {
     const nomePeca = nomesTipoPeca[pedidoGlobal.tipo_peca] || pedidoGlobal.tipo_peca;
     const larguraCm = pedidoGlobal.medidas[moldeBaseGlobal.eixo_x];
     const alturaCm = pedidoGlobal.medidas[moldeBaseGlobal.eixo_y];
-    const margemCm = 2;
-    const espacoTitulo = 2;
-    const espacoRodape = 2.5;
 
-    const larguraPagina = larguraCm + margemCm * 2;
-    const alturaPagina = alturaCm + margemCm * 2 + espacoTitulo + espacoRodape;
+    const doc = new jsPDF({ unit: "cm", format: "a4" }); // página padrão 21 x 29.7 cm
 
-    const doc = new jsPDF({
-      unit: "cm",
-      format: [larguraPagina, alturaPagina]
-    });
+    const margemCm = 1.5;
+    const areaMaxLargura = 21 - margemCm * 2; // 18 cm disponíveis
+    const areaMaxAltura = 16;                  // deixa espaço pro cabeçalho e rodapé
 
+    // Reduz o desenho só o necessário para caber na página
+    const fatorReducao = Math.min(areaMaxLargura / larguraCm, areaMaxAltura / alturaCm, 1);
+    const larguraDesenho = larguraCm * fatorReducao;
+    const alturaDesenho = alturaCm * fatorReducao;
+
+    // Cabeçalho
     doc.setFontSize(14);
     doc.text("IPÊ ROSA - " + nomePeca, margemCm, margemCm);
     doc.setFontSize(9);
     doc.text("Medidas: " + JSON.stringify(pedidoGlobal.medidas), margemCm, margemCm + 0.6);
+    doc.setTextColor(200, 80, 80);
+    doc.text(
+      `Desenho reduzido em ${Math.round(fatorReducao * 100)}% para caber na página — NAO esta em tamanho real.`,
+      margemCm, margemCm + 1.2
+    );
+    doc.setTextColor(0, 0, 0);
 
+    const yDesenho = margemCm + 1.8;
     const svgElement = document.querySelector("#molde-svg-container svg");
     await doc.svg(svgElement, {
       x: margemCm,
-      y: margemCm + espacoTitulo,
-      width: larguraCm,
-      height: alturaCm
+      y: yDesenho,
+      width: larguraDesenho,
+      height: alturaDesenho
     });
 
+    // Quadrado de calibração — este sim é sempre 5x5 cm de verdade, tamanho real
+    const yCalibracao = yDesenho + alturaDesenho + 1.5;
+    doc.setDrawColor(212, 106, 143);
+    doc.setLineWidth(0.03);
+    doc.rect(margemCm, yCalibracao, 5, 5);
+
+    doc.setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Quadrado de calibracao: deve medir exatamente 5 x 5 cm", margemCm + 5.5, yCalibracao + 1.2);
+    doc.text("apos impresso. Sempre imprima em \"Tamanho real / 100%\",", margemCm + 5.5, yCalibracao + 1.8);
+    doc.text("nunca em \"Ajustar a pagina\".", margemCm + 5.5, yCalibracao + 2.4);
+
+    // Rodapé
     doc.setFontSize(9);
     const textoAviso = doc.splitTextToSize(
-      "Versão simplificada para validação do sistema. Ainda não substitui um molde profissional — sempre faça um teste em tecido barato (toile) antes de cortar o tecido final. Imprima sem ajuste de escala (100%).",
-      larguraCm
+      "Versao simplificada para validacao do sistema, em escala reduzida - apenas referencia visual, ainda nao serve para cortar tecido. A versao em tamanho real, dividida em multiplas folhas para colar, esta no roteiro do produto.",
+      areaMaxLargura
     );
-    doc.text(textoAviso, margemCm, margemCm + espacoTitulo + alturaCm + 0.8);
+    doc.text(textoAviso, margemCm, yCalibracao + 6);
 
-    doc.save(`molde-${pedidoGlobal.tipo_peca}.pdf`);
+    doc.save(`molde-${pedidoGlobal.tipo_peca}-referencia.pdf`);
 
     mensagem.textContent = "PDF gerado! Confira sua pasta de downloads.";
     mensagem.className = "mensagem sucesso";
