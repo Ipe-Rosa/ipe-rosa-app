@@ -55,8 +55,12 @@ async function carregarMolde() {
   document.getElementById("molde-titulo").textContent =
     "Peça: " + (nomesTipoPeca[pedido.tipo_peca] || pedido.tipo_peca);
 
+// Faz o "quadro" do desenho crescer junto com a escala, para nada ficar cortado
+  const [vbX, vbY, vbLargura, vbAltura] = moldeBase.viewbox.split(" ").map(Number);
+  const novoViewBox = `${vbX} ${vbY} ${vbLargura * escalaX} ${vbAltura * escalaY}`;
+
   document.getElementById("molde-svg-container").innerHTML = `
-    <svg viewBox="${moldeBase.viewbox}" width="300" height="375" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px;">
+    <svg viewBox="${novoViewBox}" width="300" height="375" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px;">
       <g transform="scale(${escalaX}, ${escalaY})">
         <path d="${moldeBase.path_svg}" fill="none" stroke="#d46a8f" stroke-width="2" vector-effect="non-scaling-stroke"/>
       </g>
