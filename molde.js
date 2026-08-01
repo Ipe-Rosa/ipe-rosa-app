@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://ksognpzaasjevupohfdv.supabase.co";
-const SUPABASE_KEY = "sb_publishable_8rt9qB9SbfcAi0rfjhYv9A_7k5pQ6PO";
+const SUPABASE_KEY = "COLE_AQUI_SUA_PUBLISHABLE_KEY";
 
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -10,39 +10,57 @@ const nomesTipoPeca = {
   calca_reta: "Calça reta"
 };
 
-let resultadoMoldeGlobal = null;
 let pedidoGlobal = null;
+let resultadoGlobal = null; // sempre no formato { pecas: [ {nome, path, largura, altura}, ... ] }
 
-// ===== NOVO: Saia reta com fórmulas reais de bloco básico de modelagem =====
+// ===== Monta um painel (frente OU costas) com pence calculada =====
+function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence) {
+  let diferenca = larguraQuadril - larguraCintura;
+  if (diferenca < 0) diferenca = 0;
+
+  const alturaQuadril = Math.min(20, altura * 0.4);
+  const profundidadeBase = Math.max(0, Math.min(10, altura * 0.3, alturaQuadril * 0.9));
+  const profundidadePence = profundidadeBase * proporcaoPence;
+
+  const centroX = larguraQuadril * 0.6;
+  const penceEsq = centroX - diferenca / 2;
+  const penceDir = centroX + diferenca / 2;
+  const temPence = diferenca > 0.3;
+
+  const path = temPence
+    ? `M 0 0 L ${penceEsq.toFixed(2)} 0 L ${centroX.toFixed(2)} ${profundidadePence.toFixed(2)} L ${penceDir.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`
+    : `M 0 0 L ${larguraQuadril.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`;
+
+  return { path, largura: larguraQuadril, altura, temPence };
+}
+
+// ===== Saia reta: agora com frente e costas separadas =====
 function gerarMoldeSaiaReta(medidas) {
   const cintura = medidas.cintura_saia;
   const quadril = medidas.quadril_saia;
   const comprimento = medidas.comprimento_saia;
 
-  const folgaQuadril = 2;  // cm, folga total do quadril
-  const folgaCintura = 1;  // cm, folga total da cintura
+  const folgaQuadril = 2;
+  const folgaCintura = 1;
 
   const larguraQuadrilQuarto = quadril / 4 + folgaQuadril / 4;
   const larguraCinturaQuarto = cintura / 4 + folgaCintura / 4;
 
-  let diferenca = larguraQuadrilQuarto - larguraCinturaQuarto;
-  if (diferenca < 0) diferenca = 0;
+  // A frente tem menos "pence" que as costas — é assim na modelagem real,
+  // porque o corpo curva mais nas costas do que na frente.
+  const diferencaTotal = Math.max(0, larguraQuadrilQuarto - larguraCinturaQuarto);
+  const larguraCinturaFrente = larguraQuadrilQuarto - diferencaTotal * 0.4;
+  const larguraCinturaCostas = larguraQuadrilQuarto - diferencaTotal * 0.6;
 
-  const alturaQuadril = Math.min(20, comprimento * 0.4);
-  const profundidadePence = Math.max(0, Math.min(10, comprimento * 0.3, alturaQuadril * 0.9));
-  const centroX = larguraQuadrilQuarto * 0.6;
-  const penceEsq = centroX - diferenca / 2;
-  const penceDir = centroX + diferenca / 2;
+  const frente = construirPainel(larguraQuadrilQuarto, larguraCinturaFrente, comprimento, 0.8);
+  const costas = construirPainel(larguraQuadrilQuarto, larguraCinturaCostas, comprimento, 1.2);
 
-  const largura = larguraQuadrilQuarto;
-  const altura = comprimento;
-  const temPence = diferenca > 0.3;
-
-  const path = temPence
-    ? `M 0 0 L ${penceEsq.toFixed(2)} 0 L ${centroX.toFixed(2)} ${profundidadePence.toFixed(2)} L ${penceDir.toFixed(2)} 0 L ${largura.toFixed(2)} 0 L ${largura.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`
-    : `M 0 0 L ${largura.toFixed(2)} 0 L ${largura.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`;
-
-  return { path, viewBox: `0 0 ${largura.toFixed(2)} ${altura.toFixed(2)}`, largura, altura, temPence };
+  return {
+    pecas: [
+      { nome: "Frente (corte na dobra) 2x", ...frente, dobra: true },
+      { nome: "Costas (com costura central) 2x", ...costas, dobra: false }
+    ]
+  };
 }
 
 // ===== Método antigo (placeholder + escala linear) - ainda usado por camiseta e calça =====
@@ -60,16 +78,37 @@ async function gerarMoldeAntigo(pedido) {
   const escalaX = pedido.medidas[moldeBase.eixo_x] / medidasPadrao[moldeBase.eixo_x];
   const escalaY = pedido.medidas[moldeBase.eixo_y] / medidasPadrao[moldeBase.eixo_y];
 
-  const [vbX, vbY, vbLargura, vbAltura] = moldeBase.viewbox.split(" ").map(Number);
-
   return {
-    path: moldeBase.path_svg,
-    viewBox: `${vbX} ${vbY} ${(vbLargura * escalaX).toFixed(2)} ${(vbAltura * escalaY).toFixed(2)}`,
-    largura: pedido.medidas[moldeBase.eixo_x],
-    altura: pedido.medidas[moldeBase.eixo_y],
-    transformEscala: `scale(${escalaX}, ${escalaY})`,
-    temPence: false
+    pecas: [{
+      nome: nomesTipoPeca[pedido.tipo_peca] || pedido.tipo_peca,
+      path: moldeBase.path_svg,
+      largura: pedido.medidas[moldeBase.eixo_x],
+      altura: pedido.medidas[moldeBase.eixo_y],
+      transformEscala: `scale(${escalaX}, ${escalaY})`,
+      dobra: false
+    }]
   };
+}
+
+function renderizarPeca(peca) {
+  const alturaDisplay = Math.round(220 * (peca.altura / peca.largura));
+  const transform = peca.transformEscala ? `transform="${peca.transformEscala}"` : "";
+  const linhaDobra = peca.dobra
+    ? `<line x1="0" y1="0" x2="0" y2="${peca.altura.toFixed(2)}" stroke="#999" stroke-width="0.15" stroke-dasharray="1,1"/>
+       <text x="0.8" y="${(peca.altura / 2).toFixed(2)}" font-size="3" fill="#999">dobra</text>`
+    : "";
+
+  return `
+    <div style="display:inline-block; margin:8px; text-align:center;">
+      <p style="font-size:0.85rem; font-weight:bold; margin-bottom:4px;">${peca.nome}</p>
+      <svg viewBox="0 0 ${peca.largura.toFixed(2)} ${peca.altura.toFixed(2)}" width="220" height="${alturaDisplay}" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px; border:1px solid #eee;">
+        <g ${transform}>
+          <path d="${peca.path}" fill="none" stroke="#d46a8f" stroke-width="0.3"/>
+        </g>
+        ${linhaDobra}
+      </svg>
+    </div>
+  `;
 }
 
 async function carregarMolde() {
@@ -109,34 +148,17 @@ async function carregarMolde() {
     return;
   }
 
-  resultadoMoldeGlobal = resultado;
+  resultadoGlobal = resultado;
 
   document.getElementById("molde-titulo").textContent =
     "Peça: " + (nomesTipoPeca[pedido.tipo_peca] || pedido.tipo_peca);
 
-  const grupoTransform = resultado.transformEscala ? `transform="${resultado.transformEscala}"` : "";
-
-  const linhaDobra = pedido.tipo_peca === "saia_reta"
-    ? `<line x1="0" y1="0" x2="0" y2="${resultado.altura.toFixed(2)}" stroke="#999" stroke-width="0.15" stroke-dasharray="1,1"/>
-       <text x="0.8" y="${(resultado.altura / 2).toFixed(2)}" font-size="3" fill="#999">dobra</text>`
-    : "";
-
-  const alturaDisplay = Math.round(300 * (resultado.altura / resultado.largura));
-
-  document.getElementById("molde-svg-container").innerHTML = `
-    <svg viewBox="${resultado.viewBox}" width="300" height="${alturaDisplay}" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px;">
-      <g ${grupoTransform}>
-        <path d="${resultado.path}" fill="none" stroke="#d46a8f" stroke-width="0.2" vector-effect="non-scaling-stroke"/>
-      </g>
-      ${linhaDobra}
-    </svg>
-  `;
+  document.getElementById("molde-svg-container").innerHTML =
+    resultado.pecas.map(renderizarPeca).join("");
 
   const avisoExtra = document.getElementById("molde-aviso-extra");
   if (pedido.tipo_peca === "saia_reta") {
-    avisoExtra.textContent = resultado.temPence
-      ? "✅ Pence calculada com base na diferença real entre sua cintura e quadril."
-      : "Cintura e quadril próximos — pence não foi necessária neste caso.";
+    avisoExtra.textContent = "✅ Frente e costas calculadas separadamente, com pences diferentes (costas com mais profundidade, como na modelagem real).";
     avisoExtra.style.display = "block";
   } else {
     avisoExtra.style.display = "none";
@@ -150,7 +172,7 @@ async function carregarMolde() {
     .eq("id", pedido.id);
 }
 
-// ===== PDF (mesma lógica de referência reduzida de antes, agora genérica) =====
+// ===== PDF: agora percorre todas as peças, 1 por página =====
 async function gerarPDF() {
   const mensagem = document.getElementById("pdf-mensagem");
   mensagem.textContent = "Gerando PDF...";
@@ -158,56 +180,48 @@ async function gerarPDF() {
 
   try {
     const { jsPDF } = window.jspdf;
-
-    const nomePeca = nomesTipoPeca[pedidoGlobal.tipo_peca] || pedidoGlobal.tipo_peca;
-    const larguraCm = resultadoMoldeGlobal.largura;
-    const alturaCm = resultadoMoldeGlobal.altura;
-
+    const nomePecaGeral = nomesTipoPeca[pedidoGlobal.tipo_peca] || pedidoGlobal.tipo_peca;
     const doc = new jsPDF({ unit: "cm", format: "a4" });
 
     const margemCm = 1.5;
     const areaMaxLargura = 21 - margemCm * 2;
     const areaMaxAltura = 16;
 
-    const fatorReducao = Math.min(areaMaxLargura / larguraCm, areaMaxAltura / alturaCm, 1);
-    const larguraDesenho = larguraCm * fatorReducao;
-    const alturaDesenho = alturaCm * fatorReducao;
+    const todosSvgs = document.querySelectorAll("#molde-svg-container svg");
 
-    doc.setFontSize(14);
-    doc.text("IPÊ ROSA - " + nomePeca, margemCm, margemCm);
-    doc.setFontSize(9);
-    doc.text("Medidas: " + JSON.stringify(pedidoGlobal.medidas), margemCm, margemCm + 0.6);
-    doc.setTextColor(200, 80, 80);
-    doc.text(
-      `Desenho reduzido em ${Math.round(fatorReducao * 100)}% para caber na pagina - NAO esta em tamanho real.`,
-      margemCm, margemCm + 1.2
-    );
-    doc.setTextColor(0, 0, 0);
+    for (let i = 0; i < resultadoGlobal.pecas.length; i++) {
+      const peca = resultadoGlobal.pecas[i];
+      if (i > 0) doc.addPage();
 
-    const yDesenho = margemCm + 1.8;
-    const svgElement = document.querySelector("#molde-svg-container svg");
-    await doc.svg(svgElement, { x: margemCm, y: yDesenho, width: larguraDesenho, height: alturaDesenho });
+      const fatorReducao = Math.min(areaMaxLargura / peca.largura, areaMaxAltura / peca.altura, 1);
+      const larguraDesenho = peca.largura * fatorReducao;
+      const alturaDesenho = peca.altura * fatorReducao;
 
-    const yCalibracao = yDesenho + alturaDesenho + 1.5;
-    doc.setDrawColor(212, 106, 143);
-    doc.setLineWidth(0.03);
-    doc.rect(margemCm, yCalibracao, 5, 5);
+      doc.setFontSize(14);
+      doc.text("IPÊ ROSA - " + nomePecaGeral, margemCm, margemCm);
+      doc.setFontSize(11);
+      doc.text(peca.nome, margemCm, margemCm + 0.6);
+      doc.setTextColor(200, 80, 80);
+      doc.setFontSize(9);
+      doc.text(
+        `Reduzido em ${Math.round(fatorReducao * 100)}% para caber na pagina - NAO esta em tamanho real.`,
+        margemCm, margemCm + 1.2
+      );
+      doc.setTextColor(0, 0, 0);
 
-    doc.setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Quadrado de calibracao: deve medir exatamente 5 x 5 cm", margemCm + 5.5, yCalibracao + 1.2);
-    doc.text("apos impresso. Sempre imprima em \"Tamanho real / 100%\",", margemCm + 5.5, yCalibracao + 1.8);
-    doc.text("nunca em \"Ajustar a pagina\".", margemCm + 5.5, yCalibracao + 2.4);
+      const yDesenho = margemCm + 1.8;
+      await doc.svg(todosSvgs[i], { x: margemCm, y: yDesenho, width: larguraDesenho, height: alturaDesenho });
 
-    doc.setFontSize(9);
-    const textoAviso = doc.splitTextToSize(
-      "Versao simplificada para validacao do sistema, em escala reduzida - apenas referencia visual, ainda nao serve para cortar tecido. A versao em tamanho real, dividida em multiplas folhas para colar, esta no roteiro do produto.",
-      areaMaxLargura
-    );
-    doc.text(textoAviso, margemCm, yCalibracao + 6);
+      const yCalibracao = yDesenho + alturaDesenho + 1.5;
+      doc.setDrawColor(212, 106, 143);
+      doc.setLineWidth(0.03);
+      doc.rect(margemCm, yCalibracao, 5, 5);
+      doc.setFontSize(8);
+      doc.text("Quadrado de calibracao: deve medir exatamente 5 x 5 cm", margemCm + 5.5, yCalibracao + 1.2);
+      doc.text("apos impresso. Sempre imprima em \"Tamanho real / 100%\".", margemCm + 5.5, yCalibracao + 1.8);
+    }
 
     doc.save(`molde-${pedidoGlobal.tipo_peca}-referencia.pdf`);
-
     mensagem.textContent = "PDF gerado! Confira sua pasta de downloads.";
     mensagem.className = "mensagem sucesso";
   } catch (erro) {
