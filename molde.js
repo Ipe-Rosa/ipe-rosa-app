@@ -10,18 +10,19 @@ const nomesTipoPeca = {
   calca_reta: "Calça reta"
 };
 
-// ===== Margens reais (engenharia do molde), em cm =====
-const MARGEM_LATERAL = 1;   // costura lateral
-const MARGEM_CINTURA = 1;   // costura na cintura (onde encontra o cós)
-const MARGEM_BARRA = 4;     // margem de barra (dobra da bainha)
-const MARGEM_ZIPER = 1.5;   // margem extra no centro das costas (zíper)
+const MARGEM_LATERAL = 1;
+const MARGEM_CINTURA = 1;
+const MARGEM_BARRA = 4;
+const MARGEM_ZIPER = 1.5;
+
+const COR_COSTURA = "#d46a8f";
+const COR_CORTE = "#bbbbbb";
 
 let pedidoGlobal = null;
 let resultadoGlobal = null;
 
 const DEFS_SETA = `<defs><marker id="seta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>`;
 
-// ===== Monta um painel (frente OU costas), com pence + engenharia do molde =====
 function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence, margemEsquerda) {
   let diferenca = larguraQuadril - larguraCintura;
   if (diferenca < 0) diferenca = 0;
@@ -34,13 +35,10 @@ function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence,
   const penceDir = centroX + diferenca / 2;
   const temPence = diferenca > 0.3;
 
-  // Linha de costura: segue a silhueta real, incluindo a pence
   const pathCostura = temPence
     ? `M 0 0 L ${penceEsq.toFixed(2)} 0 L ${centroX.toFixed(2)} ${profundidadePence.toFixed(2)} L ${penceDir.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`
     : `M 0 0 L ${larguraQuadril.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`;
 
-  // Linha de corte: retângulo liso (a pence NÃO é recortada do tecido - ela é
-  // apenas costurada depois; o corte real do tecido é uma linha reta)
   const corteEsq = -margemEsquerda;
   const corteDir = larguraQuadril + MARGEM_LATERAL;
   const corteTopo = -MARGEM_CINTURA;
@@ -54,29 +52,25 @@ function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence,
   };
 }
 
-// ===== Monta o SVG completo de uma peça (frente ou costas) =====
 function montarPeca(painel, nome, temDobra, temZiper) {
-  const cor = "var(--t)";
   let extras = "";
 
-  extras += `<path d="${painel.pathCorte}" fill="none" stroke="var(--text-muted)" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
-  extras += `<path d="${painel.pathCostura}" fill="none" stroke="${cor}" stroke-width="0.3"/>`;
+  extras += `<path d="${painel.pathCorte}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
+  extras += `<path d="${painel.pathCostura}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
 
   if (temZiper) {
     const zY = painel.altura * 0.35;
-    extras += `<line x1="0" y1="0" x2="0" y2="${zY.toFixed(2)}" stroke="${cor}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
-    extras += `<line x1="0" y1="${zY.toFixed(2)}" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${cor}" stroke-width="0.3"/>`;
+    extras += `<line x1="0" y1="0" x2="0" y2="${zY.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+    extras += `<line x1="0" y1="${zY.toFixed(2)}" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
   } else if (temDobra) {
-    extras += `<line x1="0" y1="0" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${cor}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+    extras += `<line x1="0" y1="0" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
   }
 
-  // Fio do tecido (seta dupla)
   const grainX = painel.largura / 2;
-  extras += `<line x1="${grainX.toFixed(2)}" y1="${(painel.altura * 0.2).toFixed(2)}" x2="${grainX.toFixed(2)}" y2="${(painel.altura * 0.8).toFixed(2)}" stroke="${cor}" stroke-width="0.15" marker-start="url(#seta)" marker-end="url(#seta)"/>`;
+  extras += `<line x1="${grainX.toFixed(2)}" y1="${(painel.altura * 0.2).toFixed(2)}" x2="${grainX.toFixed(2)}" y2="${(painel.altura * 0.8).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" marker-start="url(#seta)" marker-end="url(#seta)"/>`;
 
-  // Entalhes (marcas de referência) na cintura e na barra, lado da lateral
-  extras += `<line x1="${painel.largura.toFixed(2)}" y1="-0.3" x2="${painel.largura.toFixed(2)}" y2="0.3" stroke="${cor}" stroke-width="0.3"/>`;
-  extras += `<line x1="${painel.largura.toFixed(2)}" y1="${(painel.altura - 0.3).toFixed(2)}" x2="${painel.largura.toFixed(2)}" y2="${(painel.altura + 0.3).toFixed(2)}" stroke="${cor}" stroke-width="0.3"/>`;
+  extras += `<line x1="${painel.largura.toFixed(2)}" y1="-0.3" x2="${painel.largura.toFixed(2)}" y2="0.3" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+  extras += `<line x1="${painel.largura.toFixed(2)}" y1="${(painel.altura - 0.3).toFixed(2)}" x2="${painel.largura.toFixed(2)}" y2="${(painel.altura + 0.3).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
 
   return {
     nome,
@@ -88,17 +82,14 @@ function montarPeca(painel, nome, temDobra, temZiper) {
   };
 }
 
-// ===== Cós (tira separada, mais simples) =====
 function montarCos(larguraNet, alturaNet) {
   const margem = MARGEM_LATERAL;
   const corteEsq = -margem, corteDir = larguraNet + margem;
-  const corteTopo = 0, corteBase = alturaNet;
 
-  const cor = "var(--t)";
   let extras = "";
-  extras += `<rect x="${corteEsq.toFixed(2)}" y="${corteTopo.toFixed(2)}" width="${(corteDir - corteEsq).toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="var(--text-muted)" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
-  extras += `<rect x="0" y="0" width="${larguraNet.toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${cor}" stroke-width="0.3"/>`;
-  extras += `<line x1="0" y1="${(alturaNet / 2).toFixed(2)}" x2="${larguraNet.toFixed(2)}" y2="${(alturaNet / 2).toFixed(2)}" stroke="${cor}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+  extras += `<rect x="${corteEsq.toFixed(2)}" y="0" width="${(corteDir - corteEsq).toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
+  extras += `<rect x="0" y="0" width="${larguraNet.toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+  extras += `<line x1="0" y1="${(alturaNet / 2).toFixed(2)}" x2="${larguraNet.toFixed(2)}" y2="${(alturaNet / 2).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
 
   return {
     nome: "Cós (tira separada) 1x",
@@ -145,11 +136,12 @@ async function gerarMoldeAntigo(pedido) {
   const medidasPadrao = moldeBase.medidas_padrao;
   const escalaX = pedido.medidas[moldeBase.eixo_x] / medidasPadrao[moldeBase.eixo_x];
   const escalaY = pedido.medidas[moldeBase.eixo_y] / medidasPadrao[moldeBase.eixo_y];
+  const partesViewbox = moldeBase.viewbox.split(" ");
   return {
     pecas: [{
       nome: nomesTipoPeca[pedido.tipo_peca] || pedido.tipo_peca,
-      svgConteudo: `<g transform="scale(${escalaX}, ${escalaY})"><path d="${moldeBase.path_svg}" fill="none" stroke="var(--t)" stroke-width="0.3"/></g>`,
-      viewBox: `${moldeBase.viewbox.split(" ").slice(0,2).join(" ")} ${moldeBase.viewbox.split(" ")[2]*escalaX} ${moldeBase.viewbox.split(" ")[3]*escalaY}`,
+      svgConteudo: `<g transform="scale(${escalaX}, ${escalaY})"><path d="${moldeBase.path_svg}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/></g>`,
+      viewBox: `${partesViewbox[0]} ${partesViewbox[1]} ${(partesViewbox[2]*escalaX).toFixed(2)} ${(partesViewbox[3]*escalaY).toFixed(2)}`,
       largura: pedido.medidas[moldeBase.eixo_x],
       altura: pedido.medidas[moldeBase.eixo_y],
       temPence: false
