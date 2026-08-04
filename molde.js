@@ -69,6 +69,10 @@ function montarPeca(painel, nome, temDobra, temZiper) {
   extras += `<path d="${painel.pathCorte}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
   extras += `<path d="${painel.pathCostura}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
 
+  if (painel.temPence) {
+    extras += `<line x1="${painel.centroX.toFixed(2)}" y1="0" x2="${painel.centroX.toFixed(2)}" y2="${painel.profundidadePence.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.6 0.5"/>`;
+  }
+
   if (temZiper) {
     const zY = painel.altura * 0.35;
     extras += `<line x1="0" y1="0" x2="0" y2="${zY.toFixed(2)}" stroke="#c0392b" stroke-width="0.25" stroke-dasharray="0.8 0.6"/>`;
