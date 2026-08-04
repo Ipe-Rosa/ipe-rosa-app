@@ -112,23 +112,26 @@ function montarPeca(painel, nome, temDobra, temZiper) {
 function montarCos(larguraNet, alturaNet) {
   const margem = MARGEM_LATERAL;
   const corteEsq = -margem, corteDir = larguraNet + margem;
+  const curva = alturaNet * 0.25;
 
   let extras = "";
-  extras += `<rect x="${corteEsq.toFixed(2)}" y="0" width="${(corteDir - corteEsq).toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
-  extras += `<rect x="0" y="0" width="${larguraNet.toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+  extras += `<path d="M ${corteEsq.toFixed(2)} 0 Q ${(larguraNet / 2).toFixed(2)} ${(-curva).toFixed(2)} ${corteDir.toFixed(2)} 0 L ${corteDir.toFixed(2)} ${alturaNet.toFixed(2)} Q ${(larguraNet / 2).toFixed(2)} ${(alturaNet + curva).toFixed(2)} ${corteEsq.toFixed(2)} ${alturaNet.toFixed(2)} Z" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
+  extras += `<path d="M 0 0 Q ${(larguraNet / 2).toFixed(2)} ${(-curva).toFixed(2)} ${larguraNet.toFixed(2)} 0 L ${larguraNet.toFixed(2)} ${alturaNet.toFixed(2)} Q ${(larguraNet / 2).toFixed(2)} ${(alturaNet + curva).toFixed(2)} 0 ${alturaNet.toFixed(2)} Z" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
   extras += `<line x1="0" y1="${(alturaNet / 2).toFixed(2)}" x2="${larguraNet.toFixed(2)}" y2="${(alturaNet / 2).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
   extras += `<text x="${(larguraNet * 0.3).toFixed(2)}" y="${(alturaNet / 2 - 1).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">${larguraNet.toFixed(0)}cm</text>`;
 
+  const topoView = -curva - 1;
+  const alturaView = alturaNet + curva * 2 + 2;
+
   return {
-    nome: "Cós (tira separada) 1x",
+    nome: "Cós (tira separada, anatômico) 1x",
     svgConteudo: extras,
-    viewBox: `${corteEsq.toFixed(2)} 0 ${(corteDir - corteEsq).toFixed(2)} ${alturaNet.toFixed(2)}`,
+    viewBox: `${corteEsq.toFixed(2)} ${topoView.toFixed(2)} ${(corteDir - corteEsq).toFixed(2)} ${alturaView.toFixed(2)}`,
     largura: corteDir - corteEsq,
-    altura: alturaNet,
+    altura: alturaView,
     temPence: false
   };
 }
-
 // ===== Prévia visual da peça pronta (não é o molde para cortar) =====
 function montarPreviaProntas(dadosFrente, dadosCostas) {
   function silhueta(d) {
