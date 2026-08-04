@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://ksognpzaasjevupohfdv.supabase.co";
-const SUPABASE_KEY = "sb_publishable_8rt9qB9SbfcAi0rfjhYv9A_7k5pQ6PO";
+const SUPABASE_KEY = "COLE_AQUI_SUA_PUBLISHABLE_KEY";
 
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -20,6 +20,7 @@ const COR_CORTE = "#bbbbbb";
 
 let pedidoGlobal = null;
 let resultadoGlobal = null;
+let previaGlobal = null;
 
 const DEFS_SETA = `<defs><marker id="seta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>`;
 
@@ -27,7 +28,6 @@ function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence,
   let diferenca = larguraQuadril - larguraCintura;
   if (diferenca < 0) diferenca = 0;
 
-  // Distribui a diferença: 30% vira curva na lateral, 70% vira pence
   const reducaoLateral = diferenca * 0.3;
   const diferencaPence = diferenca - reducaoLateral;
   const larguraTopo = larguraQuadril - reducaoLateral;
@@ -58,7 +58,7 @@ function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence,
   return {
     pathCostura, pathCorte, temPence,
     corteEsq, corteDir, corteTopo, corteBase,
-    largura: larguraQuadril, altura
+    largura: larguraQuadril, altura, larguraTopo, alturaQuadril
   };
 }
 
@@ -78,9 +78,19 @@ function montarPeca(painel, nome, temDobra, temZiper) {
     extras += `<text x="0.6" y="${(painel.altura / 2).toFixed(2)}" font-size="2.4" fill="${COR_COSTURA}">dobra</text>`;
   }
 
-  const grainX = painel.largura / 2;
-  extras += `<line x1="${grainX.toFixed(2)}" y1="${(painel.altura * 0.2).toFixed(2)}" x2="${grainX.toFixed(2)}" y2="${(painel.altura * 0.8).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" marker-start="url(#seta)" marker-end="url(#seta)"/>`;
+  // Fio do tecido - deslocado pra direita, deixando espaço livre pras medidas
+  const grainX = painel.largura * 0.8;
+  const grainY1 = painel.altura * 0.35;
+  const grainY2 = painel.altura * 0.65;
+  extras += `<line x1="${grainX.toFixed(2)}" y1="${grainY1.toFixed(2)}" x2="${grainX.toFixed(2)}" y2="${grainY2.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" marker-start="url(#seta)" marker-end="url(#seta)"/>`;
 
+  // Medidas escritas direto no desenho
+  const xMedida = painel.largura * 0.06;
+  extras += `<text x="${xMedida.toFixed(2)}" y="4" font-size="2.1" fill="${COR_COSTURA}">cintura ${painel.larguraTopo.toFixed(0)}cm</text>`;
+  extras += `<text x="${xMedida.toFixed(2)}" y="${Math.max(9, painel.alturaQuadril - 3).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">quadril ${painel.largura.toFixed(0)}cm</text>`;
+  extras += `<text x="${xMedida.toFixed(2)}" y="${(painel.altura - 3).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">comprimento ${painel.altura.toFixed(0)}cm</text>`;
+
+  // Entalhes na lateral
   extras += `<line x1="${painel.largura.toFixed(2)}" y1="-0.3" x2="${painel.largura.toFixed(2)}" y2="0.3" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
   extras += `<line x1="${painel.largura.toFixed(2)}" y1="${(painel.altura - 0.3).toFixed(2)}" x2="${painel.largura.toFixed(2)}" y2="${(painel.altura + 0.3).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
 
@@ -102,6 +112,7 @@ function montarCos(larguraNet, alturaNet) {
   extras += `<rect x="${corteEsq.toFixed(2)}" y="0" width="${(corteDir - corteEsq).toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
   extras += `<rect x="0" y="0" width="${larguraNet.toFixed(2)}" height="${alturaNet.toFixed(2)}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
   extras += `<line x1="0" y1="${(alturaNet / 2).toFixed(2)}" x2="${larguraNet.toFixed(2)}" y2="${(alturaNet / 2).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+  extras += `<text x="${(larguraNet * 0.3).toFixed(2)}" y="${(alturaNet / 2 - 1).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">${larguraNet.toFixed(0)}cm</text>`;
 
   return {
     nome: "Cós (tira separada) 1x",
@@ -111,6 +122,24 @@ function montarCos(larguraNet, alturaNet) {
     altura: alturaNet,
     temPence: false
   };
+}
+
+// ===== Prévia visual da peça pronta (não é o molde para cortar) =====
+function montarPreviaProntas(dadosFrente, dadosCostas) {
+  function silhueta(d) {
+    const meia = d.largura;
+    const topoMeia = d.larguraTopo;
+    const alturaQ = d.alturaQuadril;
+    const alt = d.altura;
+    let svg = `<path d="M -${meia.toFixed(2)} ${alt.toFixed(2)} L -${meia.toFixed(2)} ${alturaQ.toFixed(2)} L -${topoMeia.toFixed(2)} 0 L ${topoMeia.toFixed(2)} 0 L ${meia.toFixed(2)} ${alturaQ.toFixed(2)} L ${meia.toFixed(2)} ${alt.toFixed(2)} Z" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    svg += `<rect x="-${topoMeia.toFixed(2)}" y="-6" width="${(topoMeia * 2).toFixed(2)}" height="6" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    svg += `<line x1="0" y1="-6" x2="0" y2="${alt.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.1" stroke-dasharray="0.5 0.8" opacity="0.5"/>`;
+    return { svg, largura: meia, altura: alt };
+  }
+
+  const frente = silhueta(dadosFrente);
+  const costas = silhueta(dadosCostas);
+  return { frente, costas };
 }
 
 function gerarMoldeSaiaReta(medidas) {
@@ -131,12 +160,15 @@ function gerarMoldeSaiaReta(medidas) {
   const painelFrente = construirPainel(larguraQuadrilQuarto, larguraCinturaFrente, comprimento, 0.8, 0);
   const painelCostas = construirPainel(larguraQuadrilQuarto, larguraCinturaCostas, comprimento, 1.2, MARGEM_ZIPER);
 
+  const previa = montarPreviaProntas(painelFrente, painelCostas);
+
   return {
     pecas: [
       montarPeca(painelFrente, "Frente (corte na dobra) 2x", true, false),
       montarPeca(painelCostas, "Costas (com costura central) 2x", false, true),
       montarCos(larguraCinturaQuarto * 2, 8)
-    ]
+    ],
+    previa
   };
 }
 
@@ -157,7 +189,8 @@ async function gerarMoldeAntigo(pedido) {
       largura: pedido.medidas[moldeBase.eixo_x],
       altura: pedido.medidas[moldeBase.eixo_y],
       temPence: false
-    }]
+    }],
+    previa: null
   };
 }
 
@@ -169,6 +202,19 @@ function renderizarPeca(peca) {
       <svg viewBox="${peca.viewBox}" width="200" height="${alturaDisplay}" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px; border:1px solid #eee;">
         ${DEFS_SETA}
         ${peca.svgConteudo}
+      </svg>
+    </div>
+  `;
+}
+
+function renderizarPrevia(nome, dados) {
+  const viewBox = `${-dados.largura - 1} -7 ${(dados.largura * 2 + 2).toFixed(2)} ${(dados.altura + 8).toFixed(2)}`;
+  const alturaDisplay = Math.round(160 * ((dados.altura + 8) / (dados.largura * 2 + 2)));
+  return `
+    <div style="display:inline-block; margin:8px; text-align:center; vertical-align:top;">
+      <p style="font-size:0.75rem; color:#999;">${nome}</p>
+      <svg viewBox="${viewBox}" width="160" height="${alturaDisplay}" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px; border:1px solid #eee;">
+        ${dados.svg}
       </svg>
     </div>
   `;
@@ -209,10 +255,17 @@ async function carregarMolde() {
 
   const avisoExtra = document.getElementById("molde-aviso-extra");
   if (pedido.tipo_peca === "saia_reta") {
-    avisoExtra.textContent = "✅ Linha de costura + linha de corte (com margens reais), fio do tecido e entalhes já incluídos.";
+    avisoExtra.textContent = "✅ Linha de costura + linha de corte (com margens reais), fio do tecido, entalhes e medidas já incluídos.";
     avisoExtra.style.display = "block";
   } else {
     avisoExtra.style.display = "none";
+  }
+
+  if (resultado.previa) {
+    document.getElementById("molde-previa-container").innerHTML =
+      renderizarPrevia("Frente pronta", resultado.previa.frente) +
+      renderizarPrevia("Costas pronta", resultado.previa.costas);
+    document.getElementById("molde-previa-wrapper").style.display = "block";
   }
 
   document.getElementById("resultado-molde").style.display = "block";
