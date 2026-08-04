@@ -1,6 +1,44 @@
 const SUPABASE_URL = "https://ksognpzaasjevupohfdv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_8rt9qB9SbfcAi0rfjhYv9A_7k5pQ6PO";
 
+const mapaCamposPorTipo = {
+  saia_reta: { cintura: "cintura_saia", quadril: "quadril_saia" }
+};
+
+async function carregarTamanhosPadrao(tipoPeca) {
+  const mapa = mapaCamposPorTipo[tipoPeca];
+  if (!mapa) return;
+
+  const { data: tamanhos, error } = await supabaseClient
+    .from("tabela_medidas_padrao")
+    .select("*")
+    .order("numeracao", { ascending: true });
+
+  if (error || !tamanhos) return;
+
+  const select = document.getElementById("tamanho-padrao");
+  tamanhos.forEach((t) => {
+    const opt = document.createElement("option");
+    opt.value = t.numeracao;
+    opt.textContent = `Tamanho ${t.numeracao} (cintura ${t.cintura}cm, quadril ${t.quadril}cm)`;
+    opt.dataset.cintura = t.cintura;
+    opt.dataset.quadril = t.quadril;
+    select.appendChild(opt);
+  });
+
+  document.getElementById("seletor-tamanho-padrao").style.display = "block";
+
+  select.addEventListener("change", () => {
+    const opcao = select.options[select.selectedIndex];
+    if (!opcao.value) return;
+
+    const campoCintura = document.getElementById(mapa.cintura);
+    const campoQuadril = document.getElementById(mapa.quadril);
+    if (campoCintura) campoCintura.value = opcao.dataset.cintura;
+    if (campoQuadril) campoQuadril.value = opcao.dataset.quadril;
+  });
+}
+
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
