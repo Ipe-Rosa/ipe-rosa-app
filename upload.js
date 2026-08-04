@@ -37,34 +37,16 @@ document.getElementById("form-upload").addEventListener("submit", async (e) => {
     return;
   }
 
-  mensagem.textContent = "Enviando foto...";
+mensagem.textContent = "Registrando pedido...";
   mensagem.className = "mensagem";
 
-  const nomeArquivo = `${usuarioAtual.id}/${Date.now()}_${arquivo.name}`;
-
-  const { error: erroUpload } = await supabaseClient
-    .storage
-    .from("fotos-roupas")
-    .upload(nomeArquivo, arquivo);
-
-  if (erroUpload) {
-    mensagem.textContent = "Erro ao enviar a foto: " + erroUpload.message;
-    mensagem.className = "mensagem erro";
-    return;
-  }
-
-  const { data: urlData } = supabaseClient
-    .storage
-    .from("fotos-roupas")
-    .getPublicUrl(nomeArquivo);
-
-  const fotoUrl = urlData.publicUrl;
-
+  // Nota: a foto NÃO é mais enviada/guardada no Storage (decisão de 01/08/2026)
+  // — hoje ela não é usada para nada funcional, só o tipo de peça importa.
   const { error: erroInsercao } = await supabaseClient
     .from("pedidos_de_molde")
     .insert({
       usuario_id: usuarioAtual.id,
-      foto_url: fotoUrl,
+      foto_url: null,
       tipo_peca: tipoPeca
     });
 
