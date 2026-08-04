@@ -85,6 +85,7 @@ function mostrarCamposDoTipo(tipoPeca) {
   });
 
   document.getElementById("form-medidas").style.display = "block";
+  carregarTamanhosPadrao(tipoPeca);
 }
 
 document.getElementById("form-medidas").addEventListener("submit", async (e) => {
