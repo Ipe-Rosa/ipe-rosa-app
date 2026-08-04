@@ -27,17 +27,27 @@ function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence,
   let diferenca = larguraQuadril - larguraCintura;
   if (diferenca < 0) diferenca = 0;
 
+  // Distribui a diferença: 30% vira curva na lateral, 70% vira pence
+  const reducaoLateral = diferenca * 0.3;
+  const diferencaPence = diferenca - reducaoLateral;
+  const larguraTopo = larguraQuadril - reducaoLateral;
+
   const alturaQuadril = Math.min(20, altura * 0.4);
   const profundidadeBase = Math.max(0, Math.min(10, altura * 0.3, alturaQuadril * 0.9));
   const profundidadePence = profundidadeBase * proporcaoPence;
-  const centroX = larguraQuadril * 0.6;
-  const penceEsq = centroX - diferenca / 2;
-  const penceDir = centroX + diferenca / 2;
-  const temPence = diferenca > 0.3;
+  const centroX = Math.min(larguraQuadril * 0.6, larguraTopo - 1);
+  const penceEsq = Math.max(0, centroX - diferencaPence / 2);
+  const penceDir = Math.min(larguraTopo, centroX + diferencaPence / 2);
+  const temPence = diferencaPence > 0.3;
+  const temCurvaLateral = reducaoLateral > 0.3;
+
+  const curvaLateral = temCurvaLateral
+    ? `Q ${larguraQuadril.toFixed(2)} ${(alturaQuadril * 0.3).toFixed(2)} ${larguraTopo.toFixed(2)} 0`
+    : `L ${larguraTopo.toFixed(2)} 0`;
 
   const pathCostura = temPence
-    ? `M 0 0 L ${penceEsq.toFixed(2)} 0 L ${centroX.toFixed(2)} ${profundidadePence.toFixed(2)} L ${penceDir.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`
-    : `M 0 0 L ${larguraQuadril.toFixed(2)} 0 L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L 0 ${altura.toFixed(2)} Z`;
+    ? `M 0 ${altura.toFixed(2)} L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L ${larguraQuadril.toFixed(2)} ${alturaQuadril.toFixed(2)} ${curvaLateral} L ${penceDir.toFixed(2)} 0 L ${centroX.toFixed(2)} ${profundidadePence.toFixed(2)} L ${penceEsq.toFixed(2)} 0 L 0 0 Z`
+    : `M 0 ${altura.toFixed(2)} L ${larguraQuadril.toFixed(2)} ${altura.toFixed(2)} L ${larguraQuadril.toFixed(2)} ${alturaQuadril.toFixed(2)} ${curvaLateral} L 0 0 Z`;
 
   const corteEsq = -margemEsquerda;
   const corteDir = larguraQuadril + MARGEM_LATERAL;
