@@ -55,10 +55,11 @@ function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence,
   const corteBase = altura + MARGEM_BARRA;
   const pathCorte = `M ${corteEsq.toFixed(2)} ${corteTopo.toFixed(2)} L ${corteDir.toFixed(2)} ${corteTopo.toFixed(2)} L ${corteDir.toFixed(2)} ${corteBase.toFixed(2)} L ${corteEsq.toFixed(2)} ${corteBase.toFixed(2)} Z`;
 
-  return {
+return {
     pathCostura, pathCorte, temPence,
     corteEsq, corteDir, corteTopo, corteBase,
-    largura: larguraQuadril, altura, larguraTopo, alturaQuadril
+    largura: larguraQuadril, altura, larguraTopo, alturaQuadril,
+    centroX, profundidadePence
   };
 }
 
