@@ -70,10 +70,12 @@ function montarPeca(painel, nome, temDobra, temZiper) {
 
   if (temZiper) {
     const zY = painel.altura * 0.35;
-    extras += `<line x1="0" y1="0" x2="0" y2="${zY.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+    extras += `<line x1="0" y1="0" x2="0" y2="${zY.toFixed(2)}" stroke="#c0392b" stroke-width="0.25" stroke-dasharray="0.8 0.6"/>`;
     extras += `<line x1="0" y1="${zY.toFixed(2)}" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    extras += `<text x="0.6" y="${(zY / 2).toFixed(2)}" font-size="2.6" fill="#c0392b">abertura zíper (centro costas)</text>`;
   } else if (temDobra) {
     extras += `<line x1="0" y1="0" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+    extras += `<text x="0.6" y="${(painel.altura / 2).toFixed(2)}" font-size="2.6" fill="${COR_COSTURA}">dobra (centro frente)</text>`;
   }
 
   const grainX = painel.largura / 2;
