@@ -22,7 +22,14 @@
       </div>
 
       <form id="form-medidas" class="auth-form" style="display:none;">
-        <p id="tipo-peca-titulo" style="font-weight:bold; margin-bottom:8px;"></p>
+      <p id="tipo-peca-titulo" style="font-weight:bold; margin-bottom:8px;"></p>
+
+        <div id="seletor-tamanho-padrao" style="display:none; margin-bottom:16px; padding:12px; background:#faf3f5; border-radius:8px;">
+          <label for="tamanho-padrao">Usar um tamanho padrão (opcional)</label>
+          <select id="tamanho-padrao">
+            <option value="">Personalizado (digitar minhas medidas)</option>
+          </select>
+        </div>
 
         <!-- Campos: Camiseta básica -->
         <div class="grupo-medida" data-tipo="camiseta_basica" style="display:none;">
