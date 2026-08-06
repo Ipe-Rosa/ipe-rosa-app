@@ -309,6 +309,11 @@ async function carregarMolde() {
     document.getElementById("molde-previa-wrapper").style.display = "block";
   }
 
+  if (resultado.avatarSvg) {
+    document.getElementById("molde-avatar-container").innerHTML = resultado.avatarSvg;
+    document.getElementById("molde-avatar-wrapper").style.display = "block";
+  }
+
   document.getElementById("resultado-molde").style.display = "block";
 
   await supabaseClient.from("pedidos_de_molde").update({ status: "molde_gerado" }).eq("id", pedido.id);
