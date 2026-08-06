@@ -200,6 +200,7 @@ function gerarMoldeSaiaReta(medidas) {
   const painelCostas = construirPainel(larguraQuadrilQuarto, larguraCinturaCostas, comprimento, 1.2, MARGEM_ZIPER);
 
   const previa = montarPreviaProntas(painelFrente, painelCostas);
+  const avatarSvg = montarAvatar(painelFrente, previa);
 
   return {
     pecas: [
@@ -207,7 +208,8 @@ function gerarMoldeSaiaReta(medidas) {
       montarPeca(painelCostas, "Costas (com costura central) 2x", false, true),
       montarCos(larguraCinturaQuarto * 2, 8)
     ],
-    previa
+    previa,
+    avatarSvg
   };
 }
 
