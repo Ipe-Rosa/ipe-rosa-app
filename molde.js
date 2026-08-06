@@ -139,7 +139,7 @@ function montarPreviaProntas(dadosFrente, dadosCostas) {
     const topoMeia = d.larguraTopo;
     const alturaQ = d.alturaQuadril;
     const alt = d.altura;
-    let svg = `<path d="M -${meia.toFixed(2)} ${alt.toFixed(2)} L -${meia.toFixed(2)} ${alturaQ.toFixed(2)} L -${topoMeia.toFixed(2)} 0 L ${topoMeia.toFixed(2)} 0 L ${meia.toFixed(2)} ${alturaQ.toFixed(2)} L ${meia.toFixed(2)} ${alt.toFixed(2)} Z" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    let svg = `<path d="M -${meia.toFixed(2)} ${alt.toFixed(2)} L -${meia.toFixed(2)} ${alturaQ.toFixed(2)} L -${topoMeia.toFixed(2)} 0 L ${topoMeia.toFixed(2)} 0 L ${meia.toFixed(2)} ${alturaQ.toFixed(2)} L ${meia.toFixed(2)} ${alt.toFixed(2)} Z" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
     svg += `<rect x="-${topoMeia.toFixed(2)}" y="-6" width="${(topoMeia * 2).toFixed(2)}" height="6" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
     svg += `<line x1="0" y1="-6" x2="0" y2="${alt.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.1" stroke-dasharray="0.5 0.8" opacity="0.5"/>`;
     return { svg, largura: meia, altura: alt };
