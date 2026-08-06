@@ -153,10 +153,10 @@ function montarPreviaProntas(dadosFrente, dadosCostas) {
 const AVATAR_IMG_URL = "croqui-ipe.png";
 const AVATAR_IMG_W = 1370;
 const AVATAR_IMG_H = 1148;
-const AVATAR_CX_FRENTE = 483;
-const AVATAR_CX_COSTAS = 872;
-const AVATAR_WAIST_Y = 566;
-const AVATAR_HIP_MEIA_LARGURA = 85;
+const AVATAR_CX_FRENTE = 479;
+const AVATAR_CX_COSTAS = 820;
+const AVATAR_WAIST_Y = 540;
+const AVATAR_HIP_MEIA_LARGURA = 95;
 
 function montarAvatar(painelFrente, previa) {
   if (!previa) return null;
