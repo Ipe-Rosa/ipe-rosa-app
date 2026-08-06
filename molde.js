@@ -150,6 +150,37 @@ function montarPreviaProntas(dadosFrente, dadosCostas) {
   return { frente, costas };
 }
 
+const AVATAR_CX_FRENTE = 180;
+const AVATAR_CX_COSTAS = 480;
+const AVATAR_WAIST_Y = 248;
+const AVATAR_HIP_MEIA_LARGURA = 58;
+
+const AVATAR_CORPO_FRENTE = `<ellipse cx="180" cy="85" rx="20" ry="26" fill="none" stroke="#c9c9c9" stroke-width="1.5"/><polyline points="148 120 128 290 132 320" fill="none" stroke="#c9c9c9" stroke-width="1.5"/><polyline points="212 120 232 290 228 320" fill="none" stroke="#c9c9c9" stroke-width="1.5"/><path d="M 148 120 L 142 248 L 122 300 Q 116 318 122 335 L 138 560 L 158 560 L 162 340 L 198 340 L 202 560 L 222 560 L 238 335 Q 244 318 238 300 L 218 248 L 212 120 Z" fill="none" stroke="#c9c9c9" stroke-width="1.5"/>`;
+
+const AVATAR_CORPO_COSTAS = `<ellipse cx="480" cy="85" rx="20" ry="26" fill="none" stroke="#c9c9c9" stroke-width="1.5"/><polyline points="448 120 428 290 432 320" fill="none" stroke="#c9c9c9" stroke-width="1.5"/><polyline points="512 120 532 290 528 320" fill="none" stroke="#c9c9c9" stroke-width="1.5"/><path d="M 448 120 L 442 248 L 422 300 Q 416 318 422 335 L 438 560 L 458 560 L 462 340 L 498 340 L 502 560 L 522 560 L 538 335 Q 544 318 538 300 L 518 248 L 512 120 Z" fill="none" stroke="#c9c9c9" stroke-width="1.5"/>`;
+
+function montarAvatar(painelFrente, previa) {
+  if (!previa) return null;
+
+  const escala = AVATAR_HIP_MEIA_LARGURA / painelFrente.largura;
+  const hemY = AVATAR_WAIST_Y + painelFrente.altura * escala;
+  const alturaView = Math.max(610, hemY + 40);
+
+  const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
+  const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
+
+  return `
+    <svg viewBox="0 0 680 ${alturaView.toFixed(0)}" width="100%" style="max-width:520px; background:white; border-radius:8px; border:1px solid #eee;" xmlns="http://www.w3.org/2000/svg">
+      ${AVATAR_CORPO_FRENTE}
+      ${overlayFrente}
+      <text x="180" y="${(alturaView - 15).toFixed(0)}" text-anchor="middle" font-size="13" fill="#999999">Frente</text>
+      ${AVATAR_CORPO_COSTAS}
+      ${overlayCostas}
+      <text x="480" y="${(alturaView - 15).toFixed(0)}" text-anchor="middle" font-size="13" fill="#999999">Costas</text>
+    </svg>
+  `;
+}
+
 function gerarMoldeSaiaReta(medidas) {
   const cintura = medidas.cintura_saia;
   const quadril = medidas.quadril_saia;
