@@ -166,6 +166,11 @@ function montarAvatar(painelFrente, previa) {
   const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
   const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
 
+  const miraDebug = `
+    <circle cx="${AVATAR_CX_FRENTE}" cy="${AVATAR_WAIST_Y}" r="6" fill="red"/>
+    <circle cx="${AVATAR_CX_COSTAS}" cy="${AVATAR_WAIST_Y}" r="6" fill="red"/>
+  `;
+  
   return `
     <div style="position:relative; max-width:480px; margin:0 auto;">
       <img src="${AVATAR_IMG_URL}" alt="Manequim IPÊ ROSA" style="width:100%; display:block;">
