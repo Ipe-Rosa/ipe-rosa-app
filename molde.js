@@ -151,12 +151,12 @@ function montarPreviaProntas(dadosFrente, dadosCostas) {
 }
 
 const AVATAR_IMG_URL = "croqui-ipe.png";
-const AVATAR_IMG_W = 1370;
-const AVATAR_IMG_H = 1148;
-const AVATAR_CX_FRENTE = 479;
-const AVATAR_CX_COSTAS = 820;
-const AVATAR_WAIST_Y = 566;
-const AVATAR_HIP_MEIA_LARGURA = 85;
+const AVATAR_IMG_W = 740;
+const AVATAR_IMG_H = 1020;
+const AVATAR_CX_FRENTE = 183;
+const AVATAR_CX_COSTAS = 562;
+const AVATAR_WAIST_Y = 342;
+const AVATAR_HIP_MEIA_LARGURA = 108;
 
 function montarAvatar(painelFrente, previa) {
   if (!previa) return null;
