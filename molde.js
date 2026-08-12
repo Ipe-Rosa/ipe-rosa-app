@@ -263,7 +263,8 @@ function montarManga(comprimentoManga, alturaCavaRef) {
   const alturaCabeca = alturaCavaRef * 0.55;
   const larguraPunho = larguraBicep * 0.85;
 
-  const pathCostura = `M 0 0 Q ${(larguraBicep * 0.55).toFixed(2)} ${(alturaCabeca * 0.1).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)} L ${larguraPunho.toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraPunho).toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Q ${(-larguraBicep * 0.55).toFixed(2)} ${(alturaCabeca * 0.1).toFixed(2)} 0 0 Z`;
+ const picoAltura = alturaCabeca * 0.3;
+  const pathCostura = `M ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Q ${(-larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} 0 ${(-picoAltura).toFixed(2)} Q ${(larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)} L ${larguraPunho.toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraPunho).toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} Z`;
 
   const margem = 1;
   const corteEsq = -larguraBicep - margem;
