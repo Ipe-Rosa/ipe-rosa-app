@@ -157,7 +157,7 @@ const AVATAR_IMG_H = 1020;
 const AVATAR_CX_FRENTE = 184;
 const AVATAR_CX_COSTAS = 564;
 const AVATAR_WAIST_Y = 376;
-const AVATAR_HIP_MEIA_LARGURA = 86;
+const AVATAR_HIP_MEIA_LARGURA = 76;
 
 function montarAvatar(painelFrente, previa) {
   if (!previa) return null;
