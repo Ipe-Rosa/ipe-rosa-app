@@ -2,7 +2,8 @@ const SUPABASE_URL = "https://ksognpzaasjevupohfdv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_8rt9qB9SbfcAi0rfjhYv9A_7k5pQ6PO";
 
 const mapaCamposPorTipo = {
-  saia_reta: { cintura: "cintura_saia", quadril: "quadril_saia" }
+  saia_reta: { cintura: "cintura_saia", quadril: "quadril_saia" },
+  camiseta_basica: { busto: "busto" }
 };
 
 async function carregarTamanhosPadrao(tipoPeca) {
@@ -17,10 +18,12 @@ async function carregarTamanhosPadrao(tipoPeca) {
   if (error || !tamanhos) return;
 
   const select = document.getElementById("tamanho-padrao");
+  select.innerHTML = '<option value="">Personalizado (digitar minhas medidas)</option>';
   tamanhos.forEach((t) => {
     const opt = document.createElement("option");
     opt.value = t.numeracao;
-    opt.textContent = `Tamanho ${t.numeracao} (cintura ${t.cintura}cm, quadril ${t.quadril}cm)`;
+    opt.textContent = `Tamanho ${t.numeracao} (busto ${t.busto}cm, cintura ${t.cintura}cm, quadril ${t.quadril}cm)`;
+    opt.dataset.busto = t.busto;
     opt.dataset.cintura = t.cintura;
     opt.dataset.quadril = t.quadril;
     select.appendChild(opt);
@@ -28,15 +31,17 @@ async function carregarTamanhosPadrao(tipoPeca) {
 
   document.getElementById("seletor-tamanho-padrao").style.display = "block";
 
-  select.addEventListener("change", () => {
+  select.onchange = () => {
     const opcao = select.options[select.selectedIndex];
     if (!opcao.value) return;
 
-    const campoCintura = document.getElementById(mapa.cintura);
-    const campoQuadril = document.getElementById(mapa.quadril);
-    if (campoCintura) campoCintura.value = opcao.dataset.cintura;
-    if (campoQuadril) campoQuadril.value = opcao.dataset.quadril;
-  });
+    Object.entries(mapa).forEach(([chaveTabela, idCampo]) => {
+      const campo = document.getElementById(idCampo);
+      if (campo && opcao.dataset[chaveTabela] !== undefined) {
+        campo.value = opcao.dataset[chaveTabela];
+      }
+    });
+  };
 }
 
 const { createClient } = supabase;
