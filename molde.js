@@ -297,8 +297,8 @@ function gerarMoldeCamiseta(medidas) {
   const folgaBusto = 8;
   const largura = busto / 4 + folgaBusto / 4;
 
-  const painelFrente = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 1.6);
-  const painelCostas = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 0.5);
+  const painelFrente = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 2.2);
+  const painelCostas = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 0.4);
   const peca_manga = montarManga(manga, painelFrente.alturaCava);
 
   return {
