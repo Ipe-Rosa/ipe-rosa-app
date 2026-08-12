@@ -210,6 +210,109 @@ function gerarMoldeSaiaReta(medidas) {
   };
 }
 
+// ===== CAMISETA BÁSICA =====
+function construirPainelCamiseta(largura, alturaTotal, decoteProfundidade) {
+  const alturaCava = Math.min(largura * 0.9, alturaTotal * 0.35);
+  const larguraOmbro = largura * 0.72;
+  const larguraPescoco = largura * 0.22;
+  const shoulderY = alturaCava * 0.08;
+
+  const pathCostura = `M 0 ${alturaTotal.toFixed(2)} L ${largura.toFixed(2)} ${alturaTotal.toFixed(2)} L ${largura.toFixed(2)} ${alturaCava.toFixed(2)} Q ${(largura * 1.06).toFixed(2)} ${(alturaCava * 0.5).toFixed(2)} ${larguraOmbro.toFixed(2)} ${shoulderY.toFixed(2)} L ${larguraPescoco.toFixed(2)} 0 Q ${(larguraPescoco * 0.25).toFixed(2)} ${(decoteProfundidade * 0.15).toFixed(2)} 0 ${decoteProfundidade.toFixed(2)} Z`;
+
+  const margemLateral = 1;
+  const margemBarra = 2;
+  const margemOmbroDecote = 1;
+
+  const corteEsq = 0;
+  const corteDir = largura + margemLateral;
+  const corteTopo = -margemOmbroDecote;
+  const corteBase = alturaTotal + margemBarra;
+
+  const pathCorte = `M ${corteEsq} ${corteTopo} L ${corteDir.toFixed(2)} ${corteTopo} L ${corteDir.toFixed(2)} ${corteBase.toFixed(2)} L ${corteEsq} ${corteBase.toFixed(2)} Z`;
+
+  return { pathCostura, pathCorte, corteEsq, corteDir, corteTopo, corteBase, largura, altura: alturaTotal, alturaCava };
+}
+
+function montarPecaCamiseta(painel, nome) {
+  let extras = "";
+  extras += `<path d="${painel.pathCorte}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
+  extras += `<path d="${painel.pathCostura}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+
+  extras += `<line x1="0" y1="0" x2="0" y2="${painel.altura.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" stroke-dasharray="0.8 0.6"/>`;
+  extras += `<text x="0.6" y="${(painel.altura / 2).toFixed(2)}" font-size="2.4" fill="${COR_COSTURA}">dobra</text>`;
+
+  const grainX = painel.largura * 0.75;
+  extras += `<line x1="${grainX.toFixed(2)}" y1="${(painel.altura * 0.35).toFixed(2)}" x2="${grainX.toFixed(2)}" y2="${(painel.altura * 0.75).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" marker-start="url(#seta)" marker-end="url(#seta)"/>`;
+
+  const xMedida = painel.largura * 0.06;
+  extras += `<text x="${xMedida.toFixed(2)}" y="${(painel.alturaCava + 4).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">busto ${painel.largura.toFixed(0)}cm</text>`;
+  extras += `<text x="${xMedida.toFixed(2)}" y="${(painel.altura - 3).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">comprimento ${painel.altura.toFixed(0)}cm</text>`;
+
+  extras += `<line x1="${painel.largura.toFixed(2)}" y1="${(painel.alturaCava - 0.3).toFixed(2)}" x2="${painel.largura.toFixed(2)}" y2="${(painel.alturaCava + 0.3).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+
+  return {
+    nome, svgConteudo: extras,
+    viewBox: `${painel.corteEsq} ${painel.corteTopo} ${(painel.corteDir - painel.corteEsq).toFixed(2)} ${(painel.corteBase - painel.corteTopo).toFixed(2)}`,
+    largura: painel.corteDir - painel.corteEsq,
+    altura: painel.corteBase - painel.corteTopo
+  };
+}
+
+function montarManga(comprimentoManga, alturaCavaRef) {
+  const larguraBicep = alturaCavaRef * 0.75;
+  const alturaCabeca = alturaCavaRef * 0.55;
+  const larguraPunho = larguraBicep * 0.85;
+
+  const pathCostura = `M 0 0 Q ${(larguraBicep * 0.55).toFixed(2)} ${(alturaCabeca * 0.1).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)} L ${larguraPunho.toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraPunho).toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Q ${(-larguraBicep * 0.55).toFixed(2)} ${(alturaCabeca * 0.1).toFixed(2)} 0 0 Z`;
+
+  const margem = 1;
+  const corteEsq = -larguraBicep - margem;
+  const corteDir = larguraBicep + margem;
+  const corteTopo = -margem;
+  const corteBase = alturaCabeca + comprimentoManga + 2;
+
+  const pathCorte = `M ${corteEsq.toFixed(2)} ${corteTopo.toFixed(2)} L ${corteDir.toFixed(2)} ${corteTopo.toFixed(2)} L ${corteDir.toFixed(2)} ${corteBase.toFixed(2)} L ${corteEsq.toFixed(2)} ${corteBase.toFixed(2)} Z`;
+
+  let extras = "";
+  extras += `<path d="${pathCorte}" fill="none" stroke="${COR_CORTE}" stroke-width="0.12" stroke-dasharray="1.2 1"/>`;
+  extras += `<path d="${pathCostura}" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+  extras += `<line x1="0" y1="${(alturaCabeca + 10).toFixed(2)}" x2="0" y2="${(alturaCabeca + comprimentoManga - 10).toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.15" marker-start="url(#seta)" marker-end="url(#seta)"/>`;
+  extras += `<text x="${(-larguraBicep + 2).toFixed(2)}" y="${(alturaCabeca + comprimentoManga - 3).toFixed(2)}" font-size="2.1" fill="${COR_COSTURA}">manga ${comprimentoManga.toFixed(0)}cm</text>`;
+
+  return {
+    nome: "Manga 2x",
+    svgConteudo: extras,
+    viewBox: `${corteEsq.toFixed(2)} ${corteTopo.toFixed(2)} ${(corteDir - corteEsq).toFixed(2)} ${(corteBase - corteTopo).toFixed(2)}`,
+    largura: corteDir - corteEsq,
+    altura: corteBase - corteTopo
+  };
+}
+
+function gerarMoldeCamiseta(medidas) {
+  const busto = medidas.busto;
+  const comprimento = medidas.comprimento_camiseta;
+  const manga = medidas.manga;
+
+  const folgaBusto = 8;
+  const largura = busto / 4 + folgaBusto / 4;
+
+  const painelFrente = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 1.6);
+  const painelCostas = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 0.5);
+  const peca_manga = montarManga(manga, painelFrente.alturaCava);
+
+  return {
+    pecas: [
+      montarPecaCamiseta(painelFrente, "Frente (dobra) 2x"),
+      montarPecaCamiseta(painelCostas, "Costas (dobra) 2x"),
+      peca_manga
+    ],
+    previa: null,
+    avatarSvg: null
+  };
+}
+
+</parameter>
+
 async function gerarMoldeAntigo(pedido) {
   const { data: moldesBase, error } = await supabaseClient
     .from("moldes_base").select("*").eq("tipo_peca", pedido.tipo_peca).limit(1);
