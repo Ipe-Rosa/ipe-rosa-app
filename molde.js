@@ -397,7 +397,7 @@ async function carregarMolde() {
     resultado.pecas.map(renderizarPeca).join("");
 
   const avisoExtra = document.getElementById("molde-aviso-extra");
-  if (pedido.tipo_peca === "saia_reta") {
+  if (pedido.tipo_peca === "saia_reta" || pedido.tipo_peca === "camiseta_basica") {
     avisoExtra.textContent = "✅ Linha de costura + linha de corte (com margens reais), fio do tecido, entalhes e medidas já incluídos.";
     avisoExtra.style.display = "block";
   } else {
