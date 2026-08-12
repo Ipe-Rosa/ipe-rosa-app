@@ -289,6 +289,45 @@ function montarManga(comprimentoManga, alturaCavaRef) {
   };
 }
 
+function construirSilhuetaCamiseta(largura, alturaTotal, decoteProfundidade) {
+  const alturaCava = Math.min(largura * 0.9, alturaTotal * 0.35);
+  const larguraOmbro = largura * 0.72;
+  const larguraPescoco = largura * 0.22;
+  const shoulderY = alturaCava * 0.08;
+
+  const path = `M ${(-largura).toFixed(2)} ${alturaTotal.toFixed(2)} L ${(-largura).toFixed(2)} ${alturaCava.toFixed(2)} Q ${(-largura * 1.06).toFixed(2)} ${(alturaCava * 0.5).toFixed(2)} ${(-larguraOmbro).toFixed(2)} ${shoulderY.toFixed(2)} L ${(-larguraPescoco).toFixed(2)} 0 Q ${(-larguraPescoco * 0.25).toFixed(2)} ${(decoteProfundidade * 0.15).toFixed(2)} 0 ${decoteProfundidade.toFixed(2)} Q ${(larguraPescoco * 0.25).toFixed(2)} ${(decoteProfundidade * 0.15).toFixed(2)} ${larguraPescoco.toFixed(2)} 0 L ${larguraOmbro.toFixed(2)} ${shoulderY.toFixed(2)} Q ${(largura * 1.06).toFixed(2)} ${(alturaCava * 0.5).toFixed(2)} ${largura.toFixed(2)} ${alturaCava.toFixed(2)} L ${largura.toFixed(2)} ${alturaTotal.toFixed(2)} Z`;
+
+  return { path, largura, altura: alturaTotal, larguraOmbro };
+}
+
+function montarPreviaCamiseta(dadosFrente, dadosCostas) {
+  function silhueta(sil) {
+    const svg = `<path d="${sil.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    return { svg, largura: sil.largura, altura: sil.altura };
+  }
+  return { frente: silhueta(dadosFrente), costas: silhueta(dadosCostas) };
+}
+
+// Calibrar com a ferramenta calibrar-avatar.html (aba "Camiseta")
+const AVATAR_CAMISETA_OMBRO_Y = 180;
+const AVATAR_CAMISETA_LARGURA_OMBRO = 65;
+
+function montarAvatarCamiseta(silFrente, previa) {
+  if (!previa) return null;
+  const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.larguraOmbro;
+  const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
+  const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
+  return `
+    <div style="position:relative; max-width:480px; margin:0 auto;">
+      <img src="${AVATAR_IMG_URL}" alt="Manequim IPÊ ROSA" style="width:100%; display:block;">
+      <svg viewBox="0 0 ${AVATAR_IMG_W} ${AVATAR_IMG_H}" style="position:absolute; top:0; left:0; width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">
+        ${overlayFrente}
+        ${overlayCostas}
+      </svg>
+    </div>
+  `;
+}
+
 function gerarMoldeCamiseta(medidas) {
   const busto = medidas.busto;
   const comprimento = medidas.comprimento_camiseta;
@@ -296,10 +335,17 @@ function gerarMoldeCamiseta(medidas) {
 
   const folgaBusto = 8;
   const largura = busto / 4 + folgaBusto / 4;
+  const decoteFrenteProf = largura * 0.22 * 2.2;
+  const decoteCostasProf = largura * 0.22 * 0.4;
 
-  const painelFrente = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 2.2);
-  const painelCostas = construirPainelCamiseta(largura, comprimento, largura * 0.22 * 0.4);
+  const painelFrente = construirPainelCamiseta(largura, comprimento, decoteFrenteProf);
+  const painelCostas = construirPainelCamiseta(largura, comprimento, decoteCostasProf);
   const peca_manga = montarManga(manga, painelFrente.alturaCava);
+
+  const silFrente = construirSilhuetaCamiseta(largura, comprimento, decoteFrenteProf);
+  const silCostas = construirSilhuetaCamiseta(largura, comprimento, decoteCostasProf);
+  const previa = montarPreviaCamiseta(silFrente, silCostas);
+  const avatarSvg = montarAvatarCamiseta(silFrente, previa);
 
   return {
     pecas: [
@@ -307,8 +353,8 @@ function gerarMoldeCamiseta(medidas) {
       montarPecaCamiseta(painelCostas, "Costas (dobra) 2x"),
       peca_manga
     ],
-    previa: null,
-    avatarSvg: null
+    previa,
+    avatarSvg
   };
 }
 
