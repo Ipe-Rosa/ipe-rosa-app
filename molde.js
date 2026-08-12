@@ -311,8 +311,6 @@ function gerarMoldeCamiseta(medidas) {
   };
 }
 
-</parameter>
-
 async function gerarMoldeAntigo(pedido) {
   const { data: moldesBase, error } = await supabaseClient
     .from("moldes_base").select("*").eq("tipo_peca", pedido.tipo_peca).limit(1);
