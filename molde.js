@@ -381,6 +381,8 @@ async function carregarMolde() {
   let resultado;
   if (pedido.tipo_peca === "saia_reta") {
     resultado = gerarMoldeSaiaReta(pedido.medidas);
+  } else if (pedido.tipo_peca === "camiseta_basica") {
+    resultado = gerarMoldeCamiseta(pedido.medidas);
   } else {
     resultado = await gerarMoldeAntigo(pedido);
   }
