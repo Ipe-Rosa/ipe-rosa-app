@@ -312,17 +312,25 @@ function montarPreviaCamiseta(dadosFrente, dadosCostas) {
 const AVATAR_CAMISETA_OMBRO_Y = 200;
 const AVATAR_CAMISETA_LARGURA_OMBRO = 114;
 
-function montarAvatarCamiseta(silFrente, previa) {
+function montarAvatarCamiseta(silFrente, previa, comprimentoManga) {
   if (!previa) return null;
- const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.largura;
-  const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
-  const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
+  const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.largura;
+
+  const overlayFrenteCorpo = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
+  const overlayCostasCorpo = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
+
+  const silManga = construirSilhuetaManga(comprimentoManga, silFrente.largura * 1.2);
+  const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga);
+  const mangasCostas = mangaOverlaySVG(AVATAR_CX_COSTAS, -1, silManga) + mangaOverlaySVG(AVATAR_CX_COSTAS, 1, silManga);
+
   return `
     <div style="position:relative; max-width:480px; margin:0 auto;">
       <img src="${AVATAR_IMG_URL}" alt="Manequim IPÊ ROSA" style="width:100%; display:block;">
       <svg viewBox="0 0 ${AVATAR_IMG_W} ${AVATAR_IMG_H}" style="position:absolute; top:0; left:0; width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">
-        ${overlayFrente}
-        ${overlayCostas}
+        ${mangasFrente}
+        ${overlayFrenteCorpo}
+        ${mangasCostas}
+        ${overlayCostasCorpo}
       </svg>
     </div>
   `;
