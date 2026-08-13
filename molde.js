@@ -319,7 +319,7 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga) {
   const overlayFrenteCorpo = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
   const overlayCostasCorpo = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
 
-  const silManga = construirSilhuetaManga(comprimentoManga, silFrente.largura * 1.2);
+  const silManga = construirSilhuetaManga(comprimentoManga, painelFrente.alturaCava);
   const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga);
   const mangasCostas = mangaOverlaySVG(AVATAR_CX_COSTAS, -1, silManga) + mangaOverlaySVG(AVATAR_CX_COSTAS, 1, silManga);
 
