@@ -312,7 +312,7 @@ function montarPreviaCamiseta(dadosFrente, dadosCostas) {
 const AVATAR_CAMISETA_OMBRO_Y = 195;
 const AVATAR_CAMISETA_LARGURA_OMBRO = 76;
 
-function montarAvatarCamiseta(silFrente, previa, comprimentoManga) {
+function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente) {
   if (!previa) return null;
   const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.largura;
 
