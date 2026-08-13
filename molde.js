@@ -357,9 +357,8 @@ function mangaOverlaySVG(cx, sinal, silManga) {
   const pulsoX = cx + sinal * AVATAR_PULSO_OFFSET_X;
   const dx = pulsoX - ombroX;
   const dy = AVATAR_PULSO_Y - AVATAR_OMBRO_Y;
-  const comp = Math.sqrt(dx * dx + dy * dy);
   const angulo = Math.atan2(dx, dy) * 180 / Math.PI;
-  const escala = comp / silManga.comprimentoTotal;
+  const escala = (AVATAR_MANGA_LARGURA_PX / 2) / silManga.larguraBicep;
 
   return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escala.toFixed(3)})">
     <path d="${silManga.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="${(0.3 / escala).toFixed(2)}"/>
