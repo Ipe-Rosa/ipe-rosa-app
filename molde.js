@@ -328,6 +328,35 @@ function montarAvatarCamiseta(silFrente, previa) {
   `;
 }
 
+function construirSilhuetaManga(comprimentoManga, alturaCavaRef) {
+  const larguraBicep = alturaCavaRef * 0.75;
+  const alturaCabeca = alturaCavaRef * 0.55;
+  const larguraPunho = larguraBicep * 0.85;
+  const picoAltura = alturaCabeca * 0.3;
+  const path = `M ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Q ${(-larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} 0 ${(-picoAltura).toFixed(2)} Q ${(larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)} L ${larguraPunho.toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraPunho).toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} Z`;
+  return { path, comprimentoTotal: alturaCabeca + comprimentoManga };
+}
+
+// Calibrado direto na imagem: ombro em (100,200), pulso em (68,495), ambos relativos ao centro (184)
+const AVATAR_OMBRO_OFFSET_X = 84;
+const AVATAR_OMBRO_Y = 200;
+const AVATAR_PULSO_OFFSET_X = 116;
+const AVATAR_PULSO_Y = 495;
+
+function mangaOverlaySVG(cx, sinal, silManga) {
+  const ombroX = cx + sinal * AVATAR_OMBRO_OFFSET_X;
+  const pulsoX = cx + sinal * AVATAR_PULSO_OFFSET_X;
+  const dx = pulsoX - ombroX;
+  const dy = AVATAR_PULSO_Y - AVATAR_OMBRO_Y;
+  const comp = Math.sqrt(dx * dx + dy * dy);
+  const angulo = Math.atan2(dx, dy) * 180 / Math.PI;
+  const escala = comp / silManga.comprimentoTotal;
+
+  return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escala.toFixed(3)})">
+    <path d="${silManga.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="${(0.3 / escala).toFixed(2)}"/>
+  </g>`;
+}
+
 function gerarMoldeCamiseta(medidas) {
   const busto = medidas.busto;
   const comprimento = medidas.comprimento_camiseta;
