@@ -309,8 +309,8 @@ function montarPreviaCamiseta(dadosFrente, dadosCostas) {
 }
 
 // Calibrar com a ferramenta calibrar-avatar.html (aba "Camiseta")
-const AVATAR_CAMISETA_OMBRO_Y = 200;
-const AVATAR_CAMISETA_LARGURA_OMBRO = 114;
+const AVATAR_CAMISETA_OMBRO_Y = 195;
+const AVATAR_CAMISETA_LARGURA_OMBRO = 76;
 
 function montarAvatarCamiseta(silFrente, previa, comprimentoManga) {
   if (!previa) return null;
