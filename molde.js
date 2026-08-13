@@ -155,9 +155,9 @@ const AVATAR_IMG_URL = "croqui-ipe.png";
 const AVATAR_IMG_W = 740;
 const AVATAR_IMG_H = 1020;
 const AVATAR_CX_FRENTE = 184;
-const AVATAR_CX_COSTAS = 564;
-const AVATAR_WAIST_Y = 376;
-const AVATAR_HIP_MEIA_LARGURA = 84;
+const AVATAR_CX_COSTAS = 555;
+const AVATAR_WAIST_Y = 358;
+const AVATAR_HIP_MEIA_LARGURA = 80;
 
 function montarAvatar(painelFrente, previa) {
   if (!previa) return null;
