@@ -314,7 +314,7 @@ const AVATAR_CAMISETA_LARGURA_OMBRO = 114;
 
 function montarAvatarCamiseta(silFrente, previa) {
   if (!previa) return null;
-  const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.larguraOmbro;
+ const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.largura;
   const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
   const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
   return `
