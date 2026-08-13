@@ -382,7 +382,7 @@ function gerarMoldeCamiseta(medidas) {
   const silFrente = construirSilhuetaCamiseta(largura, comprimento, decoteFrenteProf);
   const silCostas = construirSilhuetaCamiseta(largura, comprimento, decoteCostasProf);
   const previa = montarPreviaCamiseta(silFrente, silCostas);
-  const avatarSvg = montarAvatarCamiseta(silFrente, previa, manga);
+  const avatarSvg = montarAvatarCamiseta(silFrente, previa, manga, painelFrente);
 
   return {
     pecas: [
