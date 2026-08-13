@@ -346,10 +346,11 @@ function construirSilhuetaManga(comprimentoManga, alturaCavaRef) {
 }
 
 // Calibrado direto na imagem: ombro em (100,200), pulso em (68,495), ambos relativos ao centro (184)
-const AVATAR_OMBRO_OFFSET_X = 84;
-const AVATAR_OMBRO_Y = 200;
-const AVATAR_PULSO_OFFSET_X = 116;
-const AVATAR_PULSO_Y = 495;
+const AVATAR_OMBRO_OFFSET_X = 67;
+const AVATAR_OMBRO_Y = 192;
+const AVATAR_PULSO_OFFSET_X = 105;
+const AVATAR_PULSO_Y = 473;
+const AVATAR_MANGA_LARGURA_PX = 44;
 
 function mangaOverlaySVG(cx, sinal, silManga) {
   const ombroX = cx + sinal * AVATAR_OMBRO_OFFSET_X;
