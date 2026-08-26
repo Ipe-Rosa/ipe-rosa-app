@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loja - IPÊ ROSA</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .produto-card { background:white; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .produto-card img { width:100%; height:180px; object-fit:cover; background:#f5e6ec; }
+    .produto-info { padding:12px; text-align:left; }
+    .grade-produtos { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:16px; margin-top:16px; }
+    .categoria-titulo { color:#d46a8f; margin-top:32px; margin-bottom:8px; text-align:left; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>IPÊ ROSA</h1>
+    <p>Loja do ateliê</p>
+  </header>
+
+  <main style="max-width:1000px;">
+    <div id="loja-conteudo">Carregando produtos...</div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="loja.js"></script>
+</body>
+</html>
