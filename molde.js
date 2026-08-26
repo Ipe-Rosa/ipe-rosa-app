@@ -327,10 +327,10 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente)
     <div style="position:relative; max-width:480px; margin:0 auto;">
       <img src="${AVATAR_IMG_URL}" alt="Manequim IPÊ ROSA" style="width:100%; display:block;">
       <svg viewBox="0 0 ${AVATAR_IMG_W} ${AVATAR_IMG_H}" style="position:absolute; top:0; left:0; width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">
-        ${mangasFrente}
         ${overlayFrenteCorpo}
-        ${mangasCostas}
+        ${mangasFrente}
         ${overlayCostasCorpo}
+        ${mangasCostas}
       </svg>
     </div>
   `;
