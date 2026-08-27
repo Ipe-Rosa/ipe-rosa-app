@@ -45,7 +45,6 @@ async function carregarLoja() {
             <b>${p.nome}</b>
             <p style="font-size:0.85rem; color:#666; min-height:36px;">${p.descricao || ''}</p>
             <p style="font-weight:bold; color:#d46a8f;">R$ ${Number(p.preco).toFixed(2)}</p>
-            <a href="${linkWhatsApp(p.nome)}" target="_blank" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">Comprar pelo WhatsApp</a>
           </div>
         </div>
       `;
