@@ -14,11 +14,6 @@ const nomesCategorias = {
   pet: "Brinquedos de pano pet"
 };
 
-function linkWhatsApp(nomeProduto) {
-  const texto = encodeURIComponent(`Olá! Tenho interesse no produto: ${nomeProduto} (vi na loja do site)`);
-  return `https://wa.me/${NUMERO_WHATSAPP}?text=${texto}`;
-}
-
 async function carregarLoja() {
   const { data: produtos, error } = await supabaseClient
     .from("produtos")
