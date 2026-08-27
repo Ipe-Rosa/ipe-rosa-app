@@ -1,6 +1,5 @@
 const SUPABASE_URL = "https://ksognpzaasjevupohfdv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_8rt9qB9SbfcAi0rfjhYv9A_7k5pQ6PO";
-const NUMERO_WHATSAPP = "5515996787168"; // troque pelo seu número (só números, com código do país)
 
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
