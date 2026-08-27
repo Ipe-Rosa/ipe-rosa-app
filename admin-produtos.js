@@ -44,7 +44,10 @@ document.getElementById("form-produto").addEventListener("submit", async (e) => 
 
   let fotoUrl = null;
   if (arquivo) {
-    const nomeArquivo = `${Date.now()}_${arquivo.name}`;
+    const nomeLimpo = arquivo.name
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "_");
+    const nomeArquivo = `${Date.now()}_${nomeLimpo}`;
     const { error: erroUpload } = await supabaseClient.storage.from("produtos-fotos").upload(nomeArquivo, arquivo);
     if (erroUpload) {
       mensagem.textContent = "Erro ao enviar a foto: " + erroUpload.message;
