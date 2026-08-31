@@ -358,7 +358,7 @@ function mangaOverlaySVG(cx, sinal, silManga) {
   const dx = pulsoX - ombroX;
   const dy = AVATAR_PULSO_Y - AVATAR_OMBRO_Y;
   const comp = Math.sqrt(dx * dx + dy * dy);
-  const angulo = Math.atan2(dx, dy) * 180 / Math.PI;
+  const angulo = Math.atan2(-dx, dy) * 180 / Math.PI;
   const escalaY = comp / silManga.comprimentoTotal;
   const escalaX = (AVATAR_MANGA_LARGURA_PX / 2) / silManga.larguraBicep;
   const stroke = (0.3 / Math.min(escalaX, escalaY)).toFixed(2);
