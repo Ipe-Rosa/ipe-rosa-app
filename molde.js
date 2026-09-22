@@ -359,8 +359,8 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente)
   const overlayCostasCorpo = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.costas.svg}</g></g>`;
 
   const silManga = construirSilhuetaManga(comprimentoManga, painelFrente.alturaCava);
-  const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga);
-  const mangasCostas = mangaOverlaySVG(AVATAR_CX_COSTAS, -1, silManga) + mangaOverlaySVG(AVATAR_CX_COSTAS, 1, silManga);
+  const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga, escala) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga, escala);
+  const mangasCostas = mangaOverlaySVG(AVATAR_CX_COSTAS, -1, silManga, escala) + mangaOverlaySVG(AVATAR_CX_COSTAS, 1, silManga, escala);
 
   return `
     <div style="position:relative; max-width:480px; margin:0 auto;">
@@ -382,28 +382,28 @@ function construirSilhuetaManga(comprimentoManga, alturaCavaRef) {
   const larguraPunho = larguraBicep * 0.85;
   const picoAltura = alturaCabeca * 0.3;
   const path = `M ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Q ${(-larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} 0 ${(-picoAltura).toFixed(2)} Q ${(larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)} L ${larguraPunho.toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraPunho).toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} Z`;
-  return { path, larguraBicep, comprimentoTotal: alturaCabeca + comprimentoManga };
+  return { path };
 }
 
-// Calibrado direto na imagem: ombro em (100,200), pulso em (68,495), ambos relativos ao centro (184)
+// Calibrado direto na imagem: ombro em (100,200), pulso em (68,495), ambos relativos ao centro (184).
+// Pulso só define a DIREÇÃO do braço (ângulo da manga) — o comprimento real desenhado usa a
+// mesma escala cm->px do corpo (parâmetro `escala`), não a distância até o pulso. Antes disso,
+// a manga era esticada pra sempre alcançar o pulso, virando uma cunha desproporcional em mangas
+// curtas (ver decisão de 21/09/2026 no plano mestre).
 const AVATAR_OMBRO_OFFSET_X = 67;
 const AVATAR_OMBRO_Y = 192;
 const AVATAR_PULSO_OFFSET_X = 105;
 const AVATAR_PULSO_Y = 473;
-const AVATAR_MANGA_LARGURA_PX = 44;
 
-function mangaOverlaySVG(cx, sinal, silManga) {
+function mangaOverlaySVG(cx, sinal, silManga, escala) {
   const ombroX = cx + sinal * AVATAR_OMBRO_OFFSET_X;
   const pulsoX = cx + sinal * AVATAR_PULSO_OFFSET_X;
   const dx = pulsoX - ombroX;
   const dy = AVATAR_PULSO_Y - AVATAR_OMBRO_Y;
-  const comp = Math.sqrt(dx * dx + dy * dy);
   const angulo = Math.atan2(-dx, dy) * 180 / Math.PI;
-  const escalaY = comp / silManga.comprimentoTotal;
-  const escalaX = (AVATAR_MANGA_LARGURA_PX / 2) / silManga.larguraBicep;
-  const stroke = (0.3 / Math.min(escalaX, escalaY)).toFixed(2);
+  const stroke = (0.3 / escala).toFixed(2);
 
-  return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escalaX.toFixed(3)}, ${escalaY.toFixed(3)})" filter="url(#ipeSombraPeca)">
+  return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)">
     <g class="ipe-avatar-sway ipe-avatar-sway--manga">
       <path d="${silManga.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="${stroke}"/>
       <path d="${silManga.path}" fill="url(#ipeGradTecido)"/>
