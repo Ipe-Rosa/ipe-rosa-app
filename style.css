@@ -125,3 +125,20 @@ footer {
 .mensagem { margin-top: 12px; font-size: 0.9rem; min-height: 20px; }
 .mensagem.erro { color: #c0392b; }
 .mensagem.sucesso { color: #27ae60; }
+
+/* Avatar do molde: leve balanço da peça, como um tecido real se acomodando */
+.ipe-avatar-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 8%;
+  animation: ipeAvatarSway 4.5s ease-in-out infinite;
+}
+.ipe-avatar-sway--manga {
+  animation-delay: -0.6s;
+}
+@keyframes ipeAvatarSway {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50% { transform: rotate(0.6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ipe-avatar-sway { animation: none; }
+}

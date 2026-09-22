@@ -24,6 +24,39 @@ let previaGlobal = null;
 
 const DEFS_SETA = `<defs><marker id="seta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>`;
 
+// Defs compartilhados pelo avatar: gradiente simula volume da peça sobre o corpo, e sombra suave dá profundidade
+const AVATAR_DEFS = `<defs>
+  <linearGradient id="ipeGradTecido" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#7d2f52" stop-opacity="0.32"/>
+    <stop offset="30%" stop-color="#f6bed2" stop-opacity="0"/>
+    <stop offset="55%" stop-color="#ffffff" stop-opacity="0.3"/>
+    <stop offset="78%" stop-color="#f6bed2" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#7d2f52" stop-opacity="0.32"/>
+  </linearGradient>
+  <filter id="ipeSombraPeca" x="-40%" y="-20%" width="180%" height="180%">
+    <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="#3a2030" flood-opacity="0.35"/>
+  </filter>
+</defs>`;
+
+// Linhas sutis de vinco/caimento do tecido — puramente decorativas, não fazem parte do molde
+function vincosSaia(meia, topoMeia, alturaQ, alt) {
+  const y1 = alturaQ * 0.55;
+  const y2 = alt * 0.9;
+  return `<g fill="none" stroke="#7d2f52" stroke-width="0.22" opacity="0.22" stroke-linecap="round">
+    <path d="M ${(-topoMeia * 0.55).toFixed(2)} ${(alturaQ * 0.2).toFixed(2)} Q ${(-meia * 0.7).toFixed(2)} ${y1.toFixed(2)} ${(-meia * 0.55).toFixed(2)} ${y2.toFixed(2)}"/>
+    <path d="M ${(topoMeia * 0.55).toFixed(2)} ${(alturaQ * 0.2).toFixed(2)} Q ${(meia * 0.7).toFixed(2)} ${y1.toFixed(2)} ${(meia * 0.55).toFixed(2)} ${y2.toFixed(2)}"/>
+  </g>`;
+}
+
+function vincosCamiseta(largura, altura, larguraOmbro) {
+  const y1 = altura * 0.4;
+  const y2 = altura * 0.85;
+  return `<g fill="none" stroke="#7d2f52" stroke-width="0.22" opacity="0.2" stroke-linecap="round">
+    <path d="M ${(-larguraOmbro * 0.75).toFixed(2)} ${(altura * 0.12).toFixed(2)} Q ${(-largura * 0.85).toFixed(2)} ${y1.toFixed(2)} ${(-largura * 0.6).toFixed(2)} ${y2.toFixed(2)}"/>
+    <path d="M ${(larguraOmbro * 0.75).toFixed(2)} ${(altura * 0.12).toFixed(2)} Q ${(largura * 0.85).toFixed(2)} ${y1.toFixed(2)} ${(largura * 0.6).toFixed(2)} ${y2.toFixed(2)}"/>
+  </g>`;
+}
+
 function construirPainel(larguraQuadril, larguraCintura, altura, proporcaoPence, margemEsquerda) {
   let diferenca = larguraQuadril - larguraCintura;
   if (diferenca < 0) diferenca = 0;
@@ -140,7 +173,10 @@ function montarPreviaProntas(dadosFrente, dadosCostas) {
     const alturaQ = d.alturaQuadril;
     const alt = d.altura;
     const meioY = (alturaQ * 0.5).toFixed(2);
-    let svg = `<path d="M -${meia.toFixed(2)} ${alt.toFixed(2)} L -${meia.toFixed(2)} ${alturaQ.toFixed(2)} Q -${meia.toFixed(2)} ${meioY} -${topoMeia.toFixed(2)} 0 L ${topoMeia.toFixed(2)} 0 Q ${meia.toFixed(2)} ${meioY} ${meia.toFixed(2)} ${alturaQ.toFixed(2)} L ${meia.toFixed(2)} ${alt.toFixed(2)} Z" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    const corpoPath = `M -${meia.toFixed(2)} ${alt.toFixed(2)} L -${meia.toFixed(2)} ${alturaQ.toFixed(2)} Q -${meia.toFixed(2)} ${meioY} -${topoMeia.toFixed(2)} 0 L ${topoMeia.toFixed(2)} 0 Q ${meia.toFixed(2)} ${meioY} ${meia.toFixed(2)} ${alturaQ.toFixed(2)} L ${meia.toFixed(2)} ${alt.toFixed(2)} Z`;
+    let svg = `<path d="${corpoPath}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    svg += `<path d="${corpoPath}" fill="url(#ipeGradTecido)"/>`;
+    svg += vincosSaia(meia, topoMeia, alturaQ, alt);
     svg += `<rect x="-${topoMeia.toFixed(2)}" y="-6" width="${(topoMeia * 2).toFixed(2)}" height="6" fill="none" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
     svg += `<line x1="0" y1="-6" x2="0" y2="${alt.toFixed(2)}" stroke="${COR_COSTURA}" stroke-width="0.1" stroke-dasharray="0.5 0.8" opacity="0.5"/>`;
     return { svg, largura: meia, altura: alt };
@@ -164,13 +200,14 @@ function montarAvatar(painelFrente, previa) {
 
   const escala = AVATAR_HIP_MEIA_LARGURA / painelFrente.largura;
 
-  const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
-  const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
+  const overlayFrente = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.frente.svg}</g></g>`;
+  const overlayCostas = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_WAIST_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.costas.svg}</g></g>`;
 
   return `
     <div style="position:relative; max-width:480px; margin:0 auto;">
       <img src="${AVATAR_IMG_URL}" alt="Manequim IPÊ ROSA" style="width:100%; display:block;">
    <svg viewBox="0 0 ${AVATAR_IMG_W} ${AVATAR_IMG_H}" style="position:absolute; top:0; left:0; width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">
+        ${AVATAR_DEFS}
         ${overlayFrente}
         ${overlayCostas}
       </svg>
@@ -302,7 +339,9 @@ function construirSilhuetaCamiseta(largura, alturaTotal, decoteProfundidade) {
 
 function montarPreviaCamiseta(dadosFrente, dadosCostas) {
   function silhueta(sil) {
-    const svg = `<path d="${sil.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    let svg = `<path d="${sil.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="0.3"/>`;
+    svg += `<path d="${sil.path}" fill="url(#ipeGradTecido)"/>`;
+    svg += vincosCamiseta(sil.largura, sil.altura, sil.larguraOmbro);
     return { svg, largura: sil.largura, altura: sil.altura };
   }
   return { frente: silhueta(dadosFrente), costas: silhueta(dadosCostas) };
@@ -316,8 +355,8 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente)
   if (!previa) return null;
   const escala = AVATAR_CAMISETA_LARGURA_OMBRO / silFrente.largura;
 
-  const overlayFrenteCorpo = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.frente.svg}</g>`;
-  const overlayCostasCorpo = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})">${previa.costas.svg}</g>`;
+  const overlayFrenteCorpo = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.frente.svg}</g></g>`;
+  const overlayCostasCorpo = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.costas.svg}</g></g>`;
 
   const silManga = construirSilhuetaManga(comprimentoManga, painelFrente.alturaCava);
   const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga);
@@ -327,6 +366,7 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente)
     <div style="position:relative; max-width:480px; margin:0 auto;">
       <img src="${AVATAR_IMG_URL}" alt="Manequim IPÊ ROSA" style="width:100%; display:block;">
       <svg viewBox="0 0 ${AVATAR_IMG_W} ${AVATAR_IMG_H}" style="position:absolute; top:0; left:0; width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">
+        ${AVATAR_DEFS}
         ${overlayFrenteCorpo}
         ${mangasFrente}
         ${overlayCostasCorpo}
@@ -363,8 +403,11 @@ function mangaOverlaySVG(cx, sinal, silManga) {
   const escalaX = (AVATAR_MANGA_LARGURA_PX / 2) / silManga.larguraBicep;
   const stroke = (0.3 / Math.min(escalaX, escalaY)).toFixed(2);
 
-  return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escalaX.toFixed(3)}, ${escalaY.toFixed(3)})">
-    <path d="${silManga.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="${stroke}"/>
+  return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escalaX.toFixed(3)}, ${escalaY.toFixed(3)})" filter="url(#ipeSombraPeca)">
+    <g class="ipe-avatar-sway ipe-avatar-sway--manga">
+      <path d="${silManga.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="${stroke}"/>
+      <path d="${silManga.path}" fill="url(#ipeGradTecido)"/>
+    </g>
   </g>`;
 }
 
