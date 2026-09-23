@@ -358,9 +358,15 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente)
   const overlayFrenteCorpo = `<g transform="translate(${AVATAR_CX_FRENTE} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.frente.svg}</g></g>`;
   const overlayCostasCorpo = `<g transform="translate(${AVATAR_CX_COSTAS} ${AVATAR_CAMISETA_OMBRO_Y}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)"><g class="ipe-avatar-sway">${previa.costas.svg}</g></g>`;
 
+  // Ponto de ombro real do corpo (mesma geometria de construirSilhuetaCamiseta), não um pixel fixo
+  // da ilustração — assim a manga sempre nasce exatamente onde a peça termina, sem gap de "pele"
+  // aparecendo entre o ombro e a manga em tamanhos diferentes do calibrado originalmente.
+  const ombroOffsetXPx = silFrente.larguraOmbro * escala;
+  const ombroYPx = AVATAR_CAMISETA_OMBRO_Y + painelFrente.alturaCava * 0.08 * escala;
+
   const silManga = construirSilhuetaManga(comprimentoManga, painelFrente.alturaCava);
-  const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga, escala) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga, escala);
-  const mangasCostas = mangaOverlaySVG(AVATAR_CX_COSTAS, -1, silManga, escala) + mangaOverlaySVG(AVATAR_CX_COSTAS, 1, silManga, escala);
+  const mangasFrente = mangaOverlaySVG(AVATAR_CX_FRENTE, -1, silManga, escala, ombroOffsetXPx, ombroYPx) + mangaOverlaySVG(AVATAR_CX_FRENTE, 1, silManga, escala, ombroOffsetXPx, ombroYPx);
+  const mangasCostas = mangaOverlaySVG(AVATAR_CX_COSTAS, -1, silManga, escala, ombroOffsetXPx, ombroYPx) + mangaOverlaySVG(AVATAR_CX_COSTAS, 1, silManga, escala, ombroOffsetXPx, ombroYPx);
 
   return `
     <div style="position:relative; max-width:480px; margin:0 auto;">
@@ -376,34 +382,44 @@ function montarAvatarCamiseta(silFrente, previa, comprimentoManga, painelFrente)
   `;
 }
 
+// Silhueta "como fica vestida" da manga (só pro avatar) — NÃO é o molde de corte (esse é
+// `montarManga`). O molde de corte representa o tecido todo aberto (quase a circunferência
+// inteira do braço), então usá-lo direto no avatar deixava a manga com o dobro da largura real
+// e um bico de ombro exagerado (parecia capa/poncho). Aqui a largura é bem menor (visual, não de
+// costura) e afunila do braço pro punho, com um caimento suave em vez de um pico.
 function construirSilhuetaManga(comprimentoManga, alturaCavaRef) {
-  const larguraBicep = alturaCavaRef * 0.75;
-  const alturaCabeca = alturaCavaRef * 0.55;
-  const larguraPunho = larguraBicep * 0.85;
-  const picoAltura = alturaCabeca * 0.3;
-  const path = `M ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Q ${(-larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} 0 ${(-picoAltura).toFixed(2)} Q ${(larguraBicep * 0.6).toFixed(2)} ${(-picoAltura * 0.3).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)} L ${larguraPunho.toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} L ${(-larguraPunho).toFixed(2)} ${(alturaCabeca + comprimentoManga).toFixed(2)} Z`;
+  const larguraBicep = alturaCavaRef * 0.42;
+  const larguraPunho = larguraBicep * 0.62;
+  const alturaCabeca = alturaCavaRef * 0.12;
+  const comprimentoTotal = alturaCabeca + comprimentoManga;
+  const meioManga = alturaCabeca + comprimentoManga * 0.5;
+  const path = `M ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)}
+    Q ${(-larguraBicep * 0.5).toFixed(2)} ${(-alturaCabeca * 0.4).toFixed(2)} 0 ${(-alturaCabeca * 0.5).toFixed(2)}
+    Q ${(larguraBicep * 0.5).toFixed(2)} ${(-alturaCabeca * 0.4).toFixed(2)} ${larguraBicep.toFixed(2)} ${alturaCabeca.toFixed(2)}
+    Q ${(larguraBicep * 1.06).toFixed(2)} ${meioManga.toFixed(2)} ${larguraPunho.toFixed(2)} ${comprimentoTotal.toFixed(2)}
+    L ${(-larguraPunho).toFixed(2)} ${comprimentoTotal.toFixed(2)}
+    Q ${(-larguraBicep * 1.06).toFixed(2)} ${meioManga.toFixed(2)} ${(-larguraBicep).toFixed(2)} ${alturaCabeca.toFixed(2)} Z`;
   return { path };
 }
 
-// Calibrado direto na imagem: ombro em (100,200), pulso em (68,495), ambos relativos ao centro (184).
-// Pulso só define a DIREÇÃO do braço (ângulo da manga) — o comprimento real desenhado usa a
-// mesma escala cm->px do corpo (parâmetro `escala`), não a distância até o pulso. Antes disso,
-// a manga era esticada pra sempre alcançar o pulso, virando uma cunha desproporcional em mangas
-// curtas (ver decisão de 21/09/2026 no plano mestre).
-const AVATAR_OMBRO_OFFSET_X = 67;
-const AVATAR_OMBRO_Y = 192;
+// Pulso calibrado direto na imagem (68px de offset do centro, y=473), relativo ao centro (184) —
+// serve só pra apontar a DIREÇÃO do braço (ângulo da manga). O ponto de partida (ombro) e o
+// comprimento desenhado usam a geometria real do corpo (`ombroOffsetXPx`/`ombroYPx`, calculados em
+// montarAvatarCamiseta) e a escala cm->px da peça, não distância fixa até o pulso — antes disso a
+// manga era esticada pra sempre alcançar o pulso, virando uma cunha desproporcional em mangas
+// curtas (ver decisões de 21/09 e 23/09/2026 no plano mestre).
 const AVATAR_PULSO_OFFSET_X = 105;
 const AVATAR_PULSO_Y = 473;
 
-function mangaOverlaySVG(cx, sinal, silManga, escala) {
-  const ombroX = cx + sinal * AVATAR_OMBRO_OFFSET_X;
+function mangaOverlaySVG(cx, sinal, silManga, escala, ombroOffsetXPx, ombroYPx) {
+  const ombroX = cx + sinal * ombroOffsetXPx;
   const pulsoX = cx + sinal * AVATAR_PULSO_OFFSET_X;
   const dx = pulsoX - ombroX;
-  const dy = AVATAR_PULSO_Y - AVATAR_OMBRO_Y;
+  const dy = AVATAR_PULSO_Y - ombroYPx;
   const angulo = Math.atan2(-dx, dy) * 180 / Math.PI;
   const stroke = (0.3 / escala).toFixed(2);
 
-  return `<g transform="translate(${ombroX} ${AVATAR_OMBRO_Y}) rotate(${angulo.toFixed(2)}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)">
+  return `<g transform="translate(${ombroX} ${ombroYPx}) rotate(${angulo.toFixed(2)}) scale(${escala.toFixed(3)})" filter="url(#ipeSombraPeca)">
     <g class="ipe-avatar-sway ipe-avatar-sway--manga">
       <path d="${silManga.path}" fill="#f0a8c2" fill-opacity="0.85" stroke="${COR_COSTURA}" stroke-width="${stroke}"/>
       <path d="${silManga.path}" fill="url(#ipeGradTecido)"/>
