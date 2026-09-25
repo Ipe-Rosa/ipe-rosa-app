@@ -6,8 +6,13 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const nomesCategorias = {
   bolsas: "Bolsas de pano",
-  roupas: "Roupas femininas",
   necessaire: "Necessaire",
+  lancheira: "Lancheira térmica",
+  carteiras: "Carteiras de pano",
+  saias: "Saias retas",
+  camisas: "Camisa social feminina",
+  // categorias antigas: mantidas só pra continuar exibindo produtos já cadastrados com elas
+  roupas: "Roupas femininas",
   almofada: "Almofada",
   acessorios: "Acessórios femininos",
   pet: "Brinquedos de pano pet"
@@ -23,6 +28,7 @@ async function verificarLogin() {
   }
   usuarioAtual = session.user;
   carregarProdutos();
+  carregarInteresses();
 }
 
 document.getElementById("foto").addEventListener("change", (e) => {
@@ -61,6 +67,7 @@ document.getElementById("form-produto").addEventListener("submit", async (e) => 
   const { error } = await supabaseClient.from("produtos").insert({
     nome: document.getElementById("nome").value,
     categoria: document.getElementById("categoria").value,
+    cor: document.getElementById("cor").value || null,
     descricao: document.getElementById("descricao").value,
     preco: parseFloat(document.getElementById("preco").value),
     foto_url: fotoUrl,
@@ -97,7 +104,7 @@ async function carregarProdutos() {
       <img src="${p.foto_url || ''}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; background:#f5e6ec;">
       <div style="flex:1;">
         <b>${p.nome}</b> — R$ ${Number(p.preco).toFixed(2)}<br>
-        <span style="font-size:0.8rem; color:#999;">${nomesCategorias[p.categoria] || p.categoria} ${p.disponivel ? '' : '(oculto)'}</span>
+        <span style="font-size:0.8rem; color:#999;">${nomesCategorias[p.categoria] || p.categoria}${p.cor ? ' · ' + p.cor : ''} ${p.disponivel ? '' : '(oculto)'}</span>
       </div>
       <button onclick="excluirProduto(${p.id})" class="btn-primary" style="width:auto; padding:6px 12px; background:#c0392b;">Excluir</button>
     </div>
@@ -110,5 +117,27 @@ async function excluirProduto(id) {
   carregarProdutos();
 }
 window.excluirProduto = excluirProduto;
+
+async function carregarInteresses() {
+  const lista = document.getElementById("lista-interesses");
+  const { data: interesses, error } = await supabaseClient
+    .from("interesses_produtos")
+    .select("*, produtos(nome)")
+    .order("criado_em", { ascending: false });
+
+  if (error || !interesses || interesses.length === 0) {
+    lista.innerHTML = "<p>Nenhum interesse recebido ainda.</p>";
+    return;
+  }
+
+  lista.innerHTML = interesses.map(i => `
+    <div style="border-bottom:1px solid #eee; padding:10px 0;">
+      <b>${i.nome}</b> — ${i.produtos ? i.produtos.nome : "produto removido"}<br>
+      <span style="font-size:0.85rem; color:#666;">Contato: ${i.contato}</span><br>
+      ${i.mensagem ? `<span style="font-size:0.85rem; color:#666;">"${i.mensagem}"</span><br>` : ''}
+      <span style="font-size:0.75rem; color:#999;">${new Date(i.criado_em).toLocaleString('pt-BR')}</span>
+    </div>
+  `).join("");
+}
 
 verificarLogin();

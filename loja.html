@@ -4,24 +4,78 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loja - IPÊ ROSA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    .produto-card { background:white; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-    .produto-card img { width:100%; height:180px; object-fit:cover; background:#f5e6ec; }
-    .produto-info { padding:12px; text-align:left; }
-    .grade-produtos { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:16px; margin-top:16px; }
-    .categoria-titulo { color:#d46a8f; margin-top:32px; margin-bottom:8px; text-align:left; }
+    .produto-card { background:white; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .produto-card img { width:100%; height:200px; object-fit:cover; background:#f5e6ec; }
+    .produto-info { padding:14px; text-align:left; display:flex; flex-direction:column; flex:1; }
+    .grade-produtos { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:18px; margin-top:16px; }
+    .categoria-titulo { font-family:'Playfair Display', Georgia, serif; color:#a83e68; margin-top:36px; margin-bottom:4px; text-align:left; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>IPÊ ROSA</h1>
-    <p>Loja do ateliê</p>
-  </header>
+  <div class="nav-atelie">
+    <a href="index.html" class="marca">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M30 62 L30 38 Q30 30 34 26" stroke="#a8763f" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M34 26 Q28 22 24 24" stroke="#a8763f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M34 26 Q40 20 44 22" stroke="#a8763f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="34" cy="18" r="14" fill="#e8a0bf"/>
+        <circle cx="22" cy="24" r="10" fill="#f0a8c2"/>
+        <circle cx="46" cy="24" r="10" fill="#f0a8c2"/>
+        <circle cx="34" cy="10" r="9" fill="#d46a8f"/>
+      </svg>
+      <span>Ipê Rosa</span>
+    </a>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="loja.html" class="ativo">Loja</a>
+      <a href="conta.html">Entrar</a>
+    </nav>
+  </div>
 
-  <main style="max-width:1000px;">
+  <main style="max-width:1080px;">
+    <h1 style="font-family:'Playfair Display', Georgia, serif; color:#a83e68; text-align:left; font-size:1.8rem; margin-top:12px;">
+      Loja do ateliê
+    </h1>
+    <p style="text-align:left; color:#999; margin-top:4px;">Peças de pano feitas à mão — filtre por tipo ou cor pra achar a sua.</p>
+
+    <div class="filtro-loja" id="filtro-loja" style="display:none;">
+      <select id="filtro-categoria">
+        <option value="">Todos os tipos</option>
+      </select>
+      <select id="filtro-cor">
+        <option value="">Todas as cores</option>
+      </select>
+      <button type="button" class="limpar-filtros" id="btn-limpar-filtros">Limpar filtros</button>
+    </div>
+
     <div id="loja-conteudo">Carregando produtos...</div>
   </main>
+
+  <div class="modal-interesse-fundo" id="modal-fundo">
+    <div class="modal-interesse">
+      <button type="button" class="fechar" id="modal-fechar">&times;</button>
+      <h3>Tenho interesse</h3>
+      <p class="produto-ref" id="modal-produto-nome"></p>
+      <form id="form-interesse" class="auth-form">
+        <label for="interesse-nome">Seu nome</label>
+        <input type="text" id="interesse-nome" required>
+
+        <label for="interesse-contato">WhatsApp, Instagram ou e-mail</label>
+        <input type="text" id="interesse-contato" required placeholder="Como podemos te responder?">
+
+        <label for="interesse-mensagem">Mensagem (opcional)</label>
+        <textarea id="interesse-mensagem" rows="3" style="padding:10px; border:1px solid #ddd; border-radius:6px;"></textarea>
+
+        <button type="submit" class="btn-primary">Enviar interesse</button>
+        <p id="interesse-mensagem-status" class="mensagem"></p>
+      </form>
+    </div>
+  </div>
 
   <footer>
     <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>

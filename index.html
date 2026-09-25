@@ -3,24 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IPÊ ROSA - Molde de Costura</title>
+  <title>IPÊ ROSA - Ateliê</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>IPÊ ROSA</h1>
-    <p>Transforme uma foto em molde de costura</p>
-  </header>
+  <div class="nav-atelie">
+    <a href="index.html" class="marca">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M30 62 L30 38 Q30 30 34 26" stroke="#a8763f" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M34 26 Q28 22 24 24" stroke="#a8763f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M34 26 Q40 20 44 22" stroke="#a8763f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="34" cy="18" r="14" fill="#e8a0bf"/>
+        <circle cx="22" cy="24" r="10" fill="#f0a8c2"/>
+        <circle cx="46" cy="24" r="10" fill="#f0a8c2"/>
+        <circle cx="34" cy="10" r="9" fill="#d46a8f"/>
+      </svg>
+      <span>Ipê Rosa</span>
+    </a>
+    <nav>
+      <a href="index.html" class="ativo">Início</a>
+      <a href="loja.html">Loja</a>
+      <a href="conta.html">Entrar</a>
+    </nav>
+  </div>
 
-  <main>
-    <section class="hero">
-      <h2>Em construção 🌸</h2>
-      <p>Em breve você vai poder enviar a foto de uma roupa e receber o molde pronto para imprimir.</p>
-      <a href="conta.html" class="btn-primary" style="display:inline-block; text-decoration:none; margin-top:20px;">Entrar / Criar conta</a>
-<br>
-<a href="loja.html" style="display:inline-block; margin-top:12px; color:#d46a8f;">Ver loja do ateliê →</a>
-    </section>
-  </main>
+  <section class="hero-atelie">
+    <svg class="logo-grande" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 62 L30 38 Q30 30 34 26" stroke="#a8763f" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M34 26 Q28 22 24 24" stroke="#a8763f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M34 26 Q40 20 44 22" stroke="#a8763f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="34" cy="18" r="14" fill="#e8a0bf"/>
+      <circle cx="22" cy="24" r="10" fill="#f0a8c2"/>
+      <circle cx="46" cy="24" r="10" fill="#f0a8c2"/>
+      <circle cx="34" cy="10" r="9" fill="#d46a8f"/>
+    </svg>
+    <h2>Ateliê Ipê Rosa</h2>
+    <p class="tagline">
+      Peças de pano feitas à mão, com carinho e atenção em cada detalhe — bolsas, necessaires,
+      lancheiras térmicas, carteiras, saias e camisas sociais femininas, direto do nosso ateliê
+      pra você.
+    </p>
+    <a href="loja.html" class="btn-primary btn-lg" style="display:inline-block; text-decoration:none; width:auto;">Ver a loja →</a>
+    <a href="conta.html" class="link-secundario">Já tem conta? Gerar um molde de costura →</a>
+  </section>
+
+  <section class="faixa-destaques">
+    <div class="item">
+      <div class="icone">🧵</div>
+      <h3>Feito à mão</h3>
+      <p>Cada peça é costurada artesanalmente, com cuidado do corte ao acabamento.</p>
+    </div>
+    <div class="item">
+      <div class="icone">🌸</div>
+      <h3>Tecidos selecionados</h3>
+      <p>Materiais escolhidos com carinho pra durar e ficar ainda mais bonitos com o uso.</p>
+    </div>
+    <div class="item">
+      <div class="icone">💌</div>
+      <h3>Atendimento próximo</h3>
+      <p>Fale com a gente sobre qualquer peça direto pela loja — sem robô, sem fila.</p>
+    </div>
+  </section>
 
   <footer>
     <p>&copy; 2026 IPÊ ROSA. Todos os direitos reservados.</p>
